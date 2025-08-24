@@ -2,8 +2,8 @@ import java.time.LocalDateTime;
 
 public class Ticket {
     private static final String LOT_ID = "PR1234";
-    private String ticketId;
-    private Vehicle vehicle;
+    private final String ticketId;
+    private final Vehicle vehicle;
     private final LocalDateTime entryTime;
     private LocalDateTime exitTime;
 

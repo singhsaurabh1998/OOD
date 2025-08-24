@@ -17,8 +17,8 @@ public class Floor {
      * @param floorNumber    1-based floor index.
      * @param slotsAvailable total number of slots to create on this floor.
      *                       We assume:
-     *                       - slot 1 is TRUCK
-     *                       - next 2 slots are BIKE
+     *                       - slot 1 is MOTORCYCLE
+     *                       - next 2 slots are BUS
      *                       - the rest are CAR
      */
     public Floor(int floorNumber, int slotsAvailable) {

@@ -125,7 +125,7 @@ class Cappuccino implements Beverage {
 }
 
 class CoffeeMachineService {
-    private Inventory inventory;
+    private final Inventory inventory;
     BeverageFactory beverageFactory;
 
     public CoffeeMachineService(Inventory inventory, BeverageFactory beverageFactory) {
@@ -134,7 +134,6 @@ class CoffeeMachineService {
     }
 
     public void prepareBeverage(String beverageName) {
-
         Beverage beverage = beverageFactory.createBeverageObj(beverageName);
         if (!inventory.hasEnoughIngredient(beverage.getRequiredIngredients())) {
             System.out.println("❌ Cannot prepare " + beverage.getName() + ": Not enough ingredients.");
