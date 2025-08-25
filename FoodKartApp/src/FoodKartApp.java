@@ -16,7 +16,7 @@ class Restaurant {
     int rating;
     String name;
     int capacity;
-    Map<String, FoodItem> menu = new HashMap<>();
+    Map<String, FoodItem> menu = new HashMap<>();//itemname->FoodItem
     int currentOrders = 0;//curr orders
     List<String> orderHistory = new ArrayList<>();
 
@@ -131,7 +131,7 @@ class LowestPriceSelectionStrategy implements SelectionStrategy {
 }
 
 class RestaurantService {
-    Map<String, Restaurant> restaurantMap = new HashMap<>();//item,restrant
+    Map<String, Restaurant> restaurantMap = new HashMap<>();//RestorauntName,restrant
 
     public void onboardRestaurant(String restorantName, int capacity, Map<String, Integer> menuItems) {
         Restaurant r = new Restaurant(restorantName, capacity);
