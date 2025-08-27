@@ -1,37 +1,50 @@
-// Target interface
-interface PaymentGateway {
-    void pay(String amount);
+//Target Interface (what client expects)
+interface PaymentProcessor {
+    void pay(double amount);
 }
-
-// Adaptee class (Third-party or legacy)
-class PayPalPayment {
-    public void makePayment(String amountInDollars) {
-        System.out.println("Paid $" + amountInDollars + " using PayPal.");
+//Adaptee (third-party API, can’t change)
+class StripeAPI{
+    void makePayment(double usd){
+        System.out.println("USD payment done by stripe :"+usd);
+    }
+}
+//Adaptee (third-party API, can’t change)
+class PaypalAPI{
+    void sendMoney(double inr){
+        System.out.println(inr+" INR has been paid by PayPal");
     }
 }
 
-// Adapter class
-class PayPalAdapter implements PaymentGateway {
-    private final PayPalPayment payPalPayment;
+//Adapters
+class StripeAdapter implements PaymentProcessor{
 
-    public PayPalAdapter(PayPalPayment payPalPayment) {
-        this.payPalPayment = payPalPayment;
+    private final StripeAPI api;
+    StripeAdapter(StripeAPI api){
+        this.api = api;
     }
-
     @Override
-    public void pay(String amount) {
-        // Adapter translates the interface
-        payPalPayment.makePayment(amount);
+    public void pay(double amount) {
+        api.makePayment(amount);
+    }
+}
+//Adapters
+class PayPalAdapter implements PaymentProcessor{
+
+    private final PaypalAPI api;
+    PayPalAdapter(PaypalAPI api){
+        this.api = api;
+    }
+    @Override
+    public void pay(double amount) {
+        api.sendMoney(amount);
     }
 }
 
-// Client code
 public class PaymentApp {
     public static void main(String[] args) {
-        // Client expects to work with PaymentGateway
-        PaymentGateway paymentGateway = new PayPalAdapter(new PayPalPayment());
-
-        // Works smoothly with PayPal using adapter
-        paymentGateway.pay("100");
+        PaymentProcessor stripeProcessor = new  StripeAdapter(new StripeAPI());
+        PaymentProcessor paypalProcessor = new PayPalAdapter(new PaypalAPI());
+        stripeProcessor.pay(40);
+        paypalProcessor.pay(50);
     }
 }
