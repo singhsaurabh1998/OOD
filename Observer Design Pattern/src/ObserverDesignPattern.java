@@ -70,7 +70,7 @@ class WhatsAppNotifier implements Observer {
 }
 
 // Client code
-public class NotificationApp {
+public class ObserverDesignPattern {
     public static void main(String[] args) {
         NotificationService notificationService = new NotificationService();
 
@@ -82,7 +82,7 @@ public class NotificationApp {
         notificationService.registerObserver(email);
         notificationService.registerObserver(whatsapp);
 
-        notificationService.newUpdate("Transaxtion success!");
+        notificationService.newUpdate("Transaction success!");
 
         // Remove one observer
         notificationService.removeObserver(email);

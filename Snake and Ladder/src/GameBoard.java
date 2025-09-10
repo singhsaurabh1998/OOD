@@ -3,12 +3,12 @@ import java.util.Map;
 import java.util.Queue;
 
 class GameBoard {
-    private Dice dice;
-    private Queue<Player> nextTurn;
-    private List<Jumper> snakes;
-    private List<Jumper> ladders;
-    private Map<String, Integer> playersCurrentPosition;
-    private int boardSize;
+    private final Dice dice;
+    private final Queue<Player> nextTurn;
+    private final List<Jumper> snakes;
+    private final List<Jumper> ladders;
+    private final Map<String, Integer> playersCurrentPosition;
+    private final int boardSize;
 
     GameBoard(Dice dice, Queue<Player> nextTurn, List<Jumper> snakes, List<Jumper> ladders, Map<String, Integer> playersCurrentPosition, int boardSize) {
         this.dice = dice;

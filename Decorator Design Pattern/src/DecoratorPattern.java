@@ -1,5 +1,3 @@
-import java.util.WeakHashMap;
-
 // Coffee.java
 interface Coffee {
     String getDescription();
@@ -52,7 +50,7 @@ class MilkDecorator extends CoffeeDecorator {
 
     @Override
     public double getCost() {
-        return decoratedCoffee.getCost() + 0.5;
+        return decoratedCoffee.getCost() + 5;
     }
 }
 
@@ -69,7 +67,24 @@ class SugarDecorator extends CoffeeDecorator {
 
     @Override
     public double getCost() {
-        return decoratedCoffee.getCost() + 0.2;
+        return decoratedCoffee.getCost() + 2;
+    }
+}
+
+class VanilaFlavour extends CoffeeDecorator {
+
+    public VanilaFlavour(Coffee decoratedCoffee) {
+        super(decoratedCoffee);
+    }
+
+    @Override
+    public String getDescription() {
+        return decoratedCoffee.getDescription() + ", Vanila";
+    }
+
+    @Override
+    public double getCost() {
+        return decoratedCoffee.getCost() + 1;
     }
 }
 
@@ -87,7 +102,7 @@ public class DecoratorPattern {
         System.out.println("Cost: $" + milkCoffee.getCost());
 
         // Coffee with Sugar and Milk
-        Coffee sugarMilkCoffee = new MilkDecorator (new SugarDecorator(new PlainCoffee()));
+        Coffee sugarMilkCoffee = new MilkDecorator(new VanilaFlavour (new SugarDecorator(new PlainCoffee())));
         System.out.println("\nDescription: " + sugarMilkCoffee.getDescription());
         System.out.println("Cost: $" + sugarMilkCoffee.getCost());
     }
