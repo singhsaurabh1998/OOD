@@ -10,7 +10,6 @@ public class SeatLock {
 
     public SeatLock(Seat seat, Show show, User user, int lockDurationSeconds) {
         this.seat = seat;
-       // this.show = show;
         this.lockedBy = user;
         this.lockDurationSeconds = lockDurationSeconds;
         this.lockTime = LocalDateTime.now(); // Lock timestamp
@@ -27,9 +26,6 @@ public class SeatLock {
         return seat;
     }
 
-//    public Show getShow() {
-//        return show;
-//    }
 
     public User getLockedBy() {
         return lockedBy;

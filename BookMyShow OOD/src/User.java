@@ -2,10 +2,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    private String userId;
-    private String name;
-    private String email;
-    private String city;
+    private final String userId;
+    private final String name;
+    private final String email;
     List<Booking>bookings;
 
     public User(String userId, String name, String email) {

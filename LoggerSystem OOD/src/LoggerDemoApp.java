@@ -15,29 +15,6 @@ enum LogWriterMethod {
     // Add DATABASE etc. in future
 }
 
-/**
- * Factory Pattern:
- * Creates LogWriter objects based on type.
- */
-class LogWriterFactory {
-    /**
-     * Get a LogWriter based on given type.
-     *
-     * @param type CONSOLE, FILE, etc.
-     * @return LogWriter instance
-     */
-    public static LogWriter getLogWriter(LogWriterMethod type) {
-        switch (type) {
-            case CONSOLE:
-                return new ConsoleLogWriter();
-            case FILE:
-                return new FileLogWriter();
-            // case DATABASE: return new DatabaseLogWriter();
-            default:
-                throw new IllegalArgumentException("Unknown LogWriterMethod: " + type);
-        }
-    }
-}
 
 /**
  * Strategy pattern:
@@ -74,6 +51,29 @@ class FileLogWriter implements LogWriter {
     public void write(String formattedMessage) {
         // In real code, you'd open a file & append
         System.out.println("(File) " + formattedMessage);
+    }
+}
+/**
+ * Factory Pattern:
+ * Creates LogWriter objects based on type.
+ */
+class LogWriterFactory {
+    /**
+     * Get a LogWriter based on given type.
+     *
+     * @param type CONSOLE, FILE, etc.
+     * @return LogWriter instance
+     */
+    public static LogWriter getLogWriter(LogWriterMethod type) {
+        switch (type) {
+            case CONSOLE:
+                return new ConsoleLogWriter();
+            case FILE:
+                return new FileLogWriter();
+            // case DATABASE: return new DatabaseLogWriter();
+            default:
+                throw new IllegalArgumentException("Unknown LogWriterMethod: " + type);
+        }
     }
 }
 
