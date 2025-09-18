@@ -1,266 +1,162 @@
-Great! Let’s tackle the **Parking Lot System** step by step, ensuring we apply **SOLID principles** and appropriate **design patterns** along the way.
+Nice — let’s do this cleanly and get you interview-ready.
+
+Below I’ll:
+
+1. List **primary requirements** (functional + non-functional).
+2. Propose a **clean OO design** with responsibilities and chosen design patterns (and why).
+3. Give a **UML (PlantUML)** diagram you can paste into any PlantUML viewer.
+4. Describe key classes, interfaces, and important behaviors (sequence for “park a vehicle”).
+
+After this you’ll be ready to ask me to implement the core parts (I can produce Java code next).
 
 ---
 
-## 📋 Step 0: Clarify Requirements
+# 1) Primary requirements
 
-1. **Create the parking lot** (with multiple floors).
-2. **Add floors** dynamically.
-3. **Add slots** to floors (slot types: Motorcycle, Car, Bus).
-4. **Park a vehicle**:
+## Functional (must-have)
 
-    * Find the first available slot for the vehicle type
-    * Book it and generate a ticket
-    * Store the mapping (ticket → slot → vehicle)
-5. **Unpark** (given a ticket ID).
-6. **Display free/occupied slots** per floor for a vehicle type:
+* Add vehicles entering the parking lot and assign them a spot (Park).
+* Release a parked vehicle (Unpark) and compute fee.
+* Query available spots / occupancy per floor / per spot type.
+* Support different vehicle types (Motorcycle, Car, Truck) and multiple spot sizes.
+* Support reservations (optional/simple).
+* Issue and validate parking tickets (ticket id, entry time, spot).
+* Support prioritized allocation rules (handicapped/EV/compact preference).
 
-    * Count of free slots
-    * List of free slots
-    * List of occupied slots
+## Non-functional / constraints
 
----
-
-## 🛠️ Step 1: Identify Key Classes & Enums
-
-### 1. **Enums**
-
-* `VehicleType` – MOTORCYCLE, CAR, BUS
-* `SlotType` – MOTORCYCLE, CAR, BUS
-
-*(Note: A slot type corresponds to the largest vehicle it can hold.)*
-
-### 2. **Entities / Value Objects**
-
-* `Vehicle`
-
-    * `String licensePlate`
-    * `VehicleType type`
-
-* `ParkingSlot`
-
-    * `String slotId` (e.g., “F1-S3”)
-    * `SlotType slotType`
-    * `boolean isOccupied`
-
-* `Ticket`
-
-    * `String ticketId`
-    * `Vehicle vehicle`
-    * `ParkingSlot slot`
-    * `LocalDateTime entryTime`
-    * `LocalDateTime exitTime` (null until unpark)
-
-### 3. **Structural Classes**
-
-* `Floor`
-
-    * `int floorNumber`
-    * `Map<SlotType, List<ParkingSlot>> slotsByType`
-    * Methods to add slots, query free/occupied.
-
-* `ParkingLot` (Singleton / Service class)
-
-    * `String lotId`
-    * `Map<Integer, Floor> floors`
-    * `Map<String, Ticket> activeTickets`  (ticketId → Ticket)
-    * Methods:
-
-        * `createLot(lotId)`
-        * `addFloor(floorNumber)`
-        * `addSlot(floorNumber, ParkingSlot)`
-        * `parkVehicle(Vehicle)` → `Ticket`
-        * `unparkVehicle(ticketId)`
-        * `displayFreeCount(floorNumber, VehicleType)`
-        * `displayFreeSlots(floorNumber, VehicleType)`
-        * `displayOccupiedSlots(floorNumber, VehicleType)`
+* Thread-safe (concurrent entries/exits).
+* Extensible (new spot types, pricing strategies, allocation strategies).
+* Simple persistence (tickets/history) for audit and billing.
+* Low-latency allocation (should be O(1) or O(log n) ideally).
+* Observability: publish events (occupancy change / full lot / alert).
 
 ---
 
-## 🎯 Design Patterns & SOLID
+# 2) High-level design decisions & patterns
 
-| Principle / Pattern  | Application                                                                                                                      |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| **SRP**              | Each class has a single responsibility: e.g. `Floor` manages slots; `ParkingLot` orchestrates.                                   |
-| **OCP**              | New slot or vehicle types can be added by extending enums and slots, without modifying core.                                     |
-| **LSP**              | `Vehicle` subtypes (if any) can be used wherever `Vehicle` is expected.                                                          |
-| **ISP**              | If we split display methods into interfaces (`FreeSlotDisplay`, `OccupiedSlotDisplay`), consumers only depend on what they need. |
-| **DIP**              | `ParkingLot` depends on abstractions like `SlotFinder` interface (Strategy) rather than concrete search logic.                   |
-| **Factory Pattern**  | Use a `SlotFactory` or `VehicleFactory` to create instances if creation logic grows.                                             |
-| **Strategy Pattern** | Define a `SlotFindingStrategy` interface: e.g. `FirstAvailableStrategy`, `NearestExitStrategy`.                                  |
+* **Primary data structure**: Each floor holds pools / priority structures (e.g., `TreeSet` or `PriorityQueue`) per spot type for fast allocation.
+* **SOLID**:
 
----
+    * S: Each class has single responsibility (Spot, Vehicle, Ticket, Payment, Allocator).
+    * O: Add new allocation or pricing strategies without modifying core logic (`Allocator` and `PricingStrategy` interfaces).
+    * L: Subtypes of `Vehicle` and `Spot` follow Liskov — replaceable.
+    * I: Clients depend on small focused interfaces (`IParkingLot`, `IParkingAllocator`).
+    * D: High-level code depends on abstractions (strategy interfaces), not concrete allocators.
+* **Design Patterns**:
 
-## 🔜 Next (Step 2)
-
-**Let’s start implementing the foundational enums and simple value objects**:
-
-1. **`VehicleType` & `SlotType` enums**
-2. **`Vehicle` class**
-3. **`ParkingSlot` class**
-4. **`Ticket` class**
-
-I’ll provide the Java code for these first, with explanations—then we’ll move on to `Floor` and `ParkingLot` in subsequent steps.
-
-Sound good?
-Great decision ✅! Introducing a `SlotFindingStrategy` makes your design **open to extension** (OCP) and allows plugging in different strategies (e.g., first available, nearest to lift, based on priority floor).
+    * **Singleton** — `ParkingLotManager` or `ParkingLot` (single logical lot instance).
+    * **Factory** — `VehicleFactory` / `SpotFactory` to create different types.
+    * **Strategy** — `ParkingSpotAllocator` (Nearest, FirstFit, ReservedFirst), `PricingStrategy` (flat, hourly).
+    * **Observer / Pub-Sub** — `NotificationService` to notify admins / users when lot is full or events occur.
+    * **Command (optional)** — for actions (ParkCommand, UnparkCommand) to support queueing/retries.
+    * **DAO/Repository** — for persistence of tickets/history.
 
 ---
 
-## 🎯 Why Introduce `SlotFindingStrategy`?
+# 3) UML (PlantUML) — paste into PlantUML tool
 
-Right now, your `ParkingLot` class hardcodes:
 
-```java
-for (Floor floor : floors.values()) {
-    ParkingSlot slot = floor.findFirstAvailableSlot(vehicle.getType());
-```
-
-This makes it **inflexible**. What if tomorrow:
-
-* A new rule says: *"Prefer second floor over first for bikes."*
-* Or: *"Evenly distribute cars across floors."*
-
-You’d have to **modify the ParkingLot class**, violating the Open/Closed Principle (OCP).
-
-👉 Instead, define an interface, and **inject a strategy**!
+![img.png](img.png)
 
 ---
 
-## 🧩 Step-by-Step Refactor Plan
+# 4) Key classes & responsibilities (summary)
 
-### ✅ Step 1: Define the Strategy Interface
+### `ParkingLot` (Facade / Singleton)
 
-```java
-public interface SlotFindingStrategy {
-    ParkingSlot findSlot(Vehicle vehicle, Map<Integer, Floor> floors);
-}
-```
+* Responsibilities: orchestrates park/unpark operations, delegates spot selection to `IParkingAllocator`, applies pricing, persists tickets, emits events.
+* Methods: `parkVehicle(Vehicle)`, `unparkVehicle(ticketId)`, `getAvailability()`.
 
----
+### `Floor`
 
-### ✅ Step 2: Implement `FirstAvailableSlotStrategy`
+* Holds the physical spots, keeps per-SpotType structures for fast lookup (e.g., `TreeSet` ordered by spot id or distance).
+* Thread-safe operations to mark spot occupied/free.
 
-```java
-import java.util.Map;
+### `ParkingSpot`
 
-public class FirstAvailableSlotStrategy implements SlotFindingStrategy {
-    @Override
-    public ParkingSlot findSlot(Vehicle vehicle, Map<Integer, Floor> floors) {
-        for (Floor floor : floors.values()) {
-            ParkingSlot slot = floor.findFirstAvailableSlot(vehicle.getType());
-            if (slot != null) {
-                return slot;
-            }
-        }
-        return null;
-    }
-}
-```
+* Holds `id`, `SpotType`, `occupied` flag, metadata (isEV, distanceFromEntrance maybe).
 
-* ✅ Follows existing behavior: lowest floor, lowest slot number.
+### `Vehicle` (abstract) and concrete `Car`, `Motorcycle`, `Truck`
 
----
+* Holds registration, optionally owner info, special flags (handicapped).
 
-### ✅ Step 3: Modify `ParkingLot` to Use Strategy
+### `Ticket` / `TicketRepository`
 
-Add a field and constructor:
+* Ticket: issued at entry, used to unpark. Repository persists tickets and history.
 
-```java
-private final SlotFindingStrategy slotStrategy;
+### `IParkingAllocator` (Strategy)
 
-public ParkingLot(String lotId, SlotFindingStrategy slotStrategy) {
-    this.lotId = lotId;
-    this.floors = new TreeMap<>();
-    this.activeTickets = new HashMap<>();
-    this.slotStrategy = slotStrategy;
-}
-```
+* Implementations decide which `ParkingSpot` to choose:
 
-Update `parkVehicle()`:
+    * `NearestAllocator` — choose spot closest to entrance.
+    * `FirstFitAllocator` — first available spot by type.
+    * `ReservedFirstAllocator` — reserve certain spots for VIP/Handicapped.
 
-```java
-public Ticket parkVehicle(Vehicle vehicle) {
-    ParkingSlot slot = slotStrategy.findSlot(vehicle, floors);
-    if (slot != null && slot.park(vehicle)) {
-        Ticket ticket = new Ticket(vehicle, slot.getFloorNumber(), slot.getSlotNumber());
-        activeTickets.put(ticket.getTicketId(), ticket);
-        System.out.println("✅ Parked " + vehicle.getRegistrationNumber() + " at " + ticket.getTicketId());
-        return ticket;
-    }
-    System.out.println("❌ No suitable slot found for " + vehicle.getType());
-    return null;
-}
-```
+### `IPricingStrategy`
+
+* Implementations: `HourlyPricing` (base+per-hour), `FlatRatePricing`, `GracePeriodPricing`.
+
+### `EntrancePanel` / `ExitPanel`
+
+* Lightweight UI/API that calls `ParkingLot`. The Entrance uses `VehicleFactory` to create `Vehicle` objects.
+
+### `NotificationService` (Observer)
+
+* Admins/UI can subscribe to occupancy/full events. Optionally notify users (SMS/email).
 
 ---
 
-### ✅ Step 4: Use Strategy in Client Code
+# 5) Sequence: Park a vehicle (simplified)
 
-Update `Main.java`:
+1. User arrives at `EntrancePanel.scanAndPark(vehicleInfo)`.
+2. `EntrancePanel` creates `Vehicle` via `VehicleFactory`.
+3. `EntrancePanel` calls `ParkingLot.parkVehicle(vehicle)`.
+4. `ParkingLot` calls `allocator.allocateSpot(this, vehicle)` to get a `ParkingSpot`.
+5. If spot available:
 
-```java
-public class Main {
-    public static void main(String[] args) {
-        SlotFindingStrategy strategy = new FirstAvailableSlotStrategy();
-        ParkingLot parkingLot = new ParkingLot("PR1234", strategy);
-        // ... rest of the code unchanged
-    }
-}
-```
+    * mark `ParkingSpot.assign(vehicle)` (atomic operation).
+    * create `Ticket` (ticketId, entryTime, spotId, vehicle).
+    * persist via `TicketRepository.save(ticket)`.
+    * notify observers via `NotificationService.notify(Event.PARKED)`.
+    * return `Ticket` to entrance/user.
+6. If none available:
 
----
-
-## 🧱 Text-Based UML (with Strategy)
-
-```
-                 +----------------------------+
-                 |      SlotFindingStrategy   |<<interface>>
-                 +----------------------------+
-                 | +findSlot(Vehicle, floors) |
-                 +-------------▲--------------+
-                               |
-                 +-------------+--------------+
-                 | FirstAvailableSlotStrategy |
-                 +----------------------------+
-                 | +findSlot(...)             |
-                 +----------------------------+
-
-                        uses
-                          ▲
-+-------------------+     |     +-----------+
-|    ParkingLot     |-----+-----|   Floor   |
-+-------------------+     has-a+-----------+
-```
+    * optionally add to waitlist or return failure.
 
 ---
 
-## 🔥 Future Ideas: Other Strategies
+# 6) Concurrency & performance notes
 
-You can easily define:
-
-### 1. `PriorityFloorStrategy`
-
-* Prefer 2nd floor for bikes, 1st floor for trucks, etc.
-
-### 2. `LeastOccupiedFloorStrategy`
-
-* Distribute vehicles evenly across floors.
-
-### 3. `NearestLiftSlotStrategy`
-
-* Require extra slot metadata (distance), sort accordingly.
+* **Locking granularity**: synchronize at `ParkingSpot` or per-SpotType pool rather than at whole lot to increase throughput.
+* Use `ConcurrentHashMap`, `ConcurrentLinkedQueue` or `PriorityBlockingQueue` for thread-safe pools.
+* Use optimistic locking or `compareAndSet` for spot allocation to avoid double-assignments.
+* For large lots, partitioning by floor / entrance reduces contention.
 
 ---
 
-## ✅ Summary
+# 7) Persistence & replay
 
-| Feature               | Benefit                               |
-| --------------------- | ------------------------------------- |
-| Interface abstraction | Follows OCP, allows plug & play logic |
-| Strategy pattern      | Flexible slot allocation logic        |
-| Cleaner ParkingLot    | Less responsibility, more testable    |
+* Store tickets and occupancy events in durable repo (RDBMS/NoSQL). Use idempotent writes and event sourcing if you want full audit.
+* On restart, restore spot states from persisted active tickets.
 
 ---
 
-Would you like help implementing one of the **advanced strategies**, or move on to making the parking lot **thread-safe**, or jump into another **OOD problem** like `Elevator Control`, `Library System`, or `Notification Service`?
+# 8) Extensibility examples (how SOLID + patterns help)
+
+* New pricing model? Add new class implementing `IPricingStrategy` — no change to `ParkingLot`.
+* New allocation rule? Add a new `IParkingAllocator`.
+* Add EV charging spots? Add `SpotType.ELECTRIC` and possibly `ChargingSpot` subclass.
+
+---
+
+# Next step
+
+I can now **implement the above** in Java (core classes only) with:
+
+* Thread-safe `Park`/`Unpark` logic,
+* One allocator (Nearest) and one pricing strategy (Hourly),
+* Simple in-memory `TicketRepository`,
+* A small `main()` to demo.
+
+Would you like me to implement the core Java code now? If yes, I’ll provide complete, well-documented code (with concurrency safeguards and unit-testable methods).
