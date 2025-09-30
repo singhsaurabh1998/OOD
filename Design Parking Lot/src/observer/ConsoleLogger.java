@@ -8,3 +8,4 @@ public class ConsoleLogger implements Observer {
         System.out.println("[EVENT] " + event + " TicketId=" + ticket.getTicketId());
     }
 }
+

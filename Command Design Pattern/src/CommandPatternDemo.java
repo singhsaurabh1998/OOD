@@ -16,7 +16,7 @@ class TV {
 
 // 3. Concrete Commands
 class TurnOnCommand implements Command {
-    private TV tv;
+    private final TV tv;
 
     public TurnOnCommand(TV tv) {
         this.tv = tv;

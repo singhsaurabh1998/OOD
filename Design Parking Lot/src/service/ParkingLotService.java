@@ -12,6 +12,15 @@ import strategy.SpotAllocationStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ParkingLotService manages parking and unparking of vehicles,
+ * ticket generation, and observer notifications.
+ * It uses a SpotAllocationStrategy to allocate parking spots.
+ * It maintains a list of parking floors and a repository for tickets.
+ * It provides methods to park and unpark vehicles, add observers,
+ * and display all active tickets.
+ * This class is the main service layer for parking lot operations.
+ */
 public class ParkingLotService {
     private final List<ParkingFloor> floors = new ArrayList<>();
     private final SpotAllocationStrategy allocator;
@@ -36,14 +45,15 @@ public class ParkingLotService {
             return null;
         }
 
-        boolean assigned = spot.assign(vehicle);
+        boolean assigned = spot.assign(vehicle); //synchronised call
         if (!assigned) {
+            System.out.println("No slots left ");
             return null;
         }
 
         Ticket ticket = new Ticket(vehicle.getNumber(), spot.getId());
         ticketRepo.save(ticket);
-        notificationService.notifyAll("PARKED", ticket);
+        notificationService.notifyObservers("PARKED", ticket);
 
         return ticket;
     }
@@ -55,7 +65,7 @@ public class ParkingLotService {
         }
         String tickedId = ticket.getTicketId();
         if (ticketRepo.find(tickedId) != null) {
-            ticketRepo.deleteTicket(tickedId);
+            ticketRepo.deleteTicket(tickedId);//delete from DB
         } else
             System.out.println("This Id is not in our DB");
     }

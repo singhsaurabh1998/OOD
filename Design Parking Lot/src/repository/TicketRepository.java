@@ -5,6 +5,11 @@ import model.Ticket;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * TicketRepository is responsible for managing parking tickets.
+ * It provides methods to save, find, and delete tickets.
+ * It uses an in-memory HashMap to store tickets, where the key is the ticket ID and the value is the Ticket object.
+ */
 public class TicketRepository {
     private final Map<String, Ticket> store = new HashMap<>();//id,ticket
 
@@ -16,14 +21,11 @@ public class TicketRepository {
         return store.get(ticketId);
     }
 
-    public Map<String, Ticket> getSavedTickets() {
-        return store;
-    }
-
     public void deleteTicket(String ticketId) {
         store.remove(ticketId);
     }
-    public Map<String, Ticket> showAllActiveTickets(){
+
+    public Map<String, Ticket> showAllActiveTickets() {
         return store;
     }
 }

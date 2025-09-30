@@ -4,6 +4,7 @@ import model.ParkingFloor;
 import model.ParkingSpot;
 import model.Ticket;
 import observer.ConsoleLogger;
+import observer.WhatsApp;
 import service.ParkingLotService;
 import strategy.FirstAvailableSpotAllocator;
 
@@ -25,11 +26,12 @@ public class ParkingLotDemo {
 
         ParkingLotService parkingLot = new ParkingLotService(Arrays.asList(floor1, floor2), new FirstAvailableSpotAllocator());
         parkingLot.addObserver(new ConsoleLogger());
+        parkingLot.addObserver(new WhatsApp());
 
         EntrancePanel entrance = new EntrancePanel(parkingLot);
 
         Ticket ticket = entrance.scanAndPark("KA-01-1234", VehicleType.CAR);  // goes to floor 1
-        //System.out.println(ticket);
+        System.out.println(ticket);
         parkingLot.showAllTickets();
         parkingLot.unparkVehicle(ticket);
         parkingLot.showAllTickets();

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Cart {
     private Restaurant restaurant;
-    private List<MenuItem> items = new ArrayList<>();
+    private final List<MenuItem> items = new ArrayList<>();
 
     public Cart() {
         restaurant = null;

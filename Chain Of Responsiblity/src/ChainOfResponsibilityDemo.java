@@ -15,6 +15,8 @@ class Agent extends SupportHandler {
         } else if (nextHandler != null) {
             nextHandler.handleRequest(issueLevel);
         }
+        else
+            System.out.println("Dont know who to pass this request");
     }
 }
 

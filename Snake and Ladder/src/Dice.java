@@ -12,7 +12,12 @@ public class Dice {
         this.numberOfDice = numberOfDice;
     }
 
-    int rollDice(){
-        return ((int) (Math.random()*(6*numberOfDice - 1*numberOfDice))) + 1;
+    int rollDice() {
+        int sum = 0;
+        for (int i = 0; i < numberOfDice; i++) {
+            sum += (int) (Math.random() * 6) + 1;
+        }
+        return sum;
+//        return ((int) (Math.random()*(6*numberOfDice - 1*numberOfDice))) + 1;
     }
 }

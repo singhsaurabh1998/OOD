@@ -19,6 +19,11 @@ Design a system like **BookMyShow** that allows:
 Handles the logic of seat selection, availability check, and booking.
 
 ```java
+import model.Booking;
+import model.Seat;
+import model.Show;
+import model.User;
+
 class BookingService {
     public Booking bookSeats(User user, Show show, List<Seat> requestedSeats) {
         // logic to check availability and create Booking

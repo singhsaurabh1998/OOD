@@ -19,13 +19,14 @@ class GameBoard {
         this.boardSize = boardSize;
     }
 
-    void startGame() {
+    void startGame() throws InterruptedException {
         while (nextTurn.size() > 1) {
+            //Thread.sleep(800);
             Player player = nextTurn.poll();
             String playerName = player.getPlayerName();
             int currentPosition = playersCurrentPosition.get(playerName);
             int diceValue = dice.rollDice();
-
+            System.out.println(playerName + " rolled a " + diceValue);
             int nextCell = currentPosition + diceValue;
 
             // If move exceeds board size, skip turn

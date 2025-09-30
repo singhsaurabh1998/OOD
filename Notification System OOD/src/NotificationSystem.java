@@ -1,4 +1,4 @@
-// Java version of the C++ Notification System using Decorator, Observer, Strategy, and Singleton Patterns
+// Java version of Notification System using Decorator, Observer, Strategy, and Singleton Patterns
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +100,7 @@ class NotificationObservable implements Subject {
         return currentNotification.getContent();
     }
 }
+
 class NotificationEngine implements IObserver {
     private final NotificationObservable notificationObservable;
     private final List<INotificationStrategy> notificationStrategies = new ArrayList<>();
@@ -111,9 +112,6 @@ class NotificationEngine implements IObserver {
     public void addNotificationStrategy(INotificationStrategy strategy) {
         this.notificationStrategies.add(strategy);
     }
-//    public void removeNotificationStrategy(INotificationStrategy strategy) {
-//        this.notificationStrategies.remove(strategy);
-//    }
 
     public void update() {
         String msg = notificationObservable.getNotificationContent();
@@ -123,17 +121,17 @@ class NotificationEngine implements IObserver {
     }
 }
 // Concrete Observer 1
-//class Logger implements IObserver {
-//    private final NotificationObservable notificationObservable;
-//
-//    public Logger(NotificationObservable observable) {
-//        this.notificationObservable = observable;
-//    }
-//
-//    public void update() {
-//        System.out.println("Logging New Notification : \n" + notificationObservable.getNotificationContent());
-//    }
-//}
+class Logger implements IObserver {
+    private final NotificationObservable notificationObservable;
+
+    public Logger(NotificationObservable observable) {
+        this.notificationObservable = observable;
+    }
+
+    public void update() {
+        System.out.println("Logging New Notification : \n" + notificationObservable.getNotificationContent());
+    }
+}
 
 /*============================
   Strategy Pattern Components (Concrete Observer 2)
@@ -186,7 +184,7 @@ class PopUpStrategy implements INotificationStrategy {
 class NotificationService {
     private final NotificationObservable observable;
     private static NotificationService instance;
-    private final List<INotification> notifications = new ArrayList<>();
+    private final List<INotification> notifications = new ArrayList<>(); //just for tracking purpose
 
     private NotificationService() {
         observable = new NotificationObservable();
@@ -219,8 +217,7 @@ public class NotificationSystem {
         NotificationObservable notificationObservable = notificationService.getObservable();
 
         // Create Logger Observer
-        //  Logger logger = new Logger(notificationObservable);
-
+          Logger logger = new Logger(notificationObservable);
         // Create NotificationEngine observers.
         NotificationEngine notificationEngine = new NotificationEngine(notificationObservable);
 
@@ -229,7 +226,7 @@ public class NotificationSystem {
         notificationEngine.addNotificationStrategy(new PopUpStrategy());
 
         // Attach these observers.
-        // notificationObservable.addObserver(logger);
+         notificationObservable.addObserver(logger);
         notificationObservable.addObserver(notificationEngine);
 
         // Create a notification with decorators.

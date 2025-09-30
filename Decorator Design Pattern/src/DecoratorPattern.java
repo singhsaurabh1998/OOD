@@ -20,7 +20,7 @@ class PlainCoffee implements Coffee {
 
 // CoffeeDecorator.java
 abstract class CoffeeDecorator implements Coffee {
-    protected Coffee decoratedCoffee;
+    protected Coffee decoratedCoffee; //we have to initialize this in constructor through subclass
 
     public CoffeeDecorator(Coffee decoratedCoffee) {
         this.decoratedCoffee = decoratedCoffee;

@@ -270,9 +270,9 @@ public class VendingMachineDemo {
         machine.refillItem(Item.PEPSI, 2);
         machine.showItems();
 
-        machine.insertCoin(Coin.HUNDRED); // ₹20
-        machine.insertCoin(Coin.HUNDRED); // ₹20
-        machine.insertCoin(Coin.HUNDRED); // ₹20
+        machine.insertCoin(Coin.TEN); // ₹20
+        machine.insertCoin(Coin.TWENTY); // ₹20
+        machine.insertCoin(Coin.TWENTY); // ₹20
         machine.insertCoin(Coin.TEN);
         machine.selectItem(Item.COKE);
 

@@ -6,6 +6,10 @@ import model.Ticket;
 import model.Vehicle;
 import service.ParkingLotService;
 
+/**
+ * EntrancePanel acts as a facade for parking lot entry operations.
+ * It simplifies the process of scanning a vehicle and creates a parking ticket.
+ */
 public class EntrancePanel {
     private final ParkingLotService parkingLotService;
 

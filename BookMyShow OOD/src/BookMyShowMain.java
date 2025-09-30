@@ -1,3 +1,12 @@
+import Observer.EmailService;
+import Observer.LoyaltyService;
+import Observer.NotificationService;
+import Observer.SMSService;
+import enums.SeatType;
+import model.*;
+import security.SeatLockProvider;
+import services.BookingService;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,8 +19,8 @@ public class BookMyShowMain {
         Movie jawan = new Movie("movie1", "Jawan", "Hindi", 120, List.of("romance", "action"));
         Movie Pathan = new Movie("movie2", "Pathan", "Hindi", 140, List.of("romcom", "action"));
 
-        Seat s1 = new Seat("s1", 1, 1, SeatType.REGULAR);
-        Seat s2 = new Seat("s2", 2, 1, SeatType.PREMIUM);
+        Seat s1 = new Seat( 1, 1, SeatType.REGULAR);
+        Seat s2 = new Seat( 2, 1, SeatType.PREMIUM);
         List<Seat> totalSeats = List.of(s1, s2);
 
         Screen screen1 = new Screen("screen1", "Audi1");
@@ -24,22 +33,16 @@ public class BookMyShowMain {
         SeatLockProvider seatLockProvider = new SeatLockProvider(10);
 
         BookingService bookingService = new BookingService(seatLockProvider);
-        /*service.lockSeats(user1,show1,totalSeats);
-        service.confirmBooking(user2,show1,totalSeats);
-        // service.bookSeats(user2,show1,List.of("s1","s2"));
+        NotificationService notificationService = new NotificationService();
 
-        service.showAvailableSeats(show1);
-        Thread.sleep(15000);
-        service.showAvailableSeats(show1);*/
-        //its easy
         // Register notification observers
-        bookingService.registerObserver(new EmailService());
-        bookingService.registerObserver(new SMSService());
-        bookingService.registerObserver(new LoyaltyService());
+        notificationService.addObserver(new EmailService());
+        notificationService.addObserver(new SMSService());
+        notificationService.addObserver(new LoyaltyService());
         Runnable bookingTask1 = () -> {
             try {
                 System.out.println("👤 Saurabh trying to lock seats...");
-                bookingService.lockSeats(user1, show, totalSeats);
+                bookingService.lockSeats(user1, totalSeats);
                 Thread.sleep(100); // simulate some delay (e.g., payment)
                 bookingService.confirmBooking(user1, show, totalSeats);
             } catch (Exception e) {
@@ -50,7 +53,7 @@ public class BookMyShowMain {
         Runnable bookingTask2 = () -> {
             try {
                 System.out.println("👤 Sunda trying to lock seats...");
-                bookingService.lockSeats(user2, show, totalSeats);
+                bookingService.lockSeats(user2, totalSeats);
                 Thread.sleep(100); // simulate some delay
                 bookingService.confirmBooking(user2, show, totalSeats);
             } catch (Exception e) {
@@ -60,7 +63,7 @@ public class BookMyShowMain {
         Runnable bookingTask3 = () -> {
             try {
                 System.out.println("👤 Rk trying to lock seats...");
-                bookingService.lockSeats(user3, show, totalSeats);
+                bookingService.lockSeats(user3, totalSeats);
                 Thread.sleep(100); // simulate some delay
                 bookingService.confirmBooking(user3, show, totalSeats);
             } catch (Exception e) {

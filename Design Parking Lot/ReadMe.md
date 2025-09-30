@@ -56,9 +56,7 @@ After this you’ll be ready to ask me to implement the core parts (I can produc
 
 # 3) UML (PlantUML) — paste into PlantUML tool
 
-
-![img.png](img.png)
-
+![img_1.png](img_1.png)
 ---
 
 # 4) Key classes & responsibilities (summary)

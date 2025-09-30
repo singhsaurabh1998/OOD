@@ -4,7 +4,7 @@ public class User {
     private int userId;
     private String name;
     private String address;
-    private Cart cart;
+    private final Cart cart;
 
     public User(int userId, String name, String address) {
         this.userId = userId;

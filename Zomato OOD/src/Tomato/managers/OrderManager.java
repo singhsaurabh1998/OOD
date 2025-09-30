@@ -7,7 +7,7 @@ import Tomato.models.Order;
 
 
 public class OrderManager {
-    private List<Order> orders = new ArrayList<>();
+    private final List<Order> orders = new ArrayList<>();
     private static OrderManager instance = null;
 
     private OrderManager() {

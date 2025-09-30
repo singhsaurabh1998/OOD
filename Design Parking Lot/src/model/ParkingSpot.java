@@ -2,6 +2,9 @@ package model;
 
 import enums.VehicleType;
 
+/**
+ * ParkingSpot represents a single parking spot in the parking lot.
+ */
 public class ParkingSpot {
     private final int id;
     private final VehicleType spotType;//for which type of vehicle it can be used
