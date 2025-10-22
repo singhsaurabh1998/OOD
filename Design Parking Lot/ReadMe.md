@@ -157,4 +157,91 @@ I can now **implement the above** in Java (core classes only) with:
 * Simple in-memory `TicketRepository`,
 * A small `main()` to demo.
 
-Would you like me to implement the core Java code now? If yes, I’ll provide complete, well-documented code (with concurrency safeguards and unit-testable methods).
+**API (REST)**  
+Base: `/api/v1`
+- `POST /vehicles` body: `{number, type}` -> register vehicle
+- `GET /vehicles/{number}`
+- `GET /floors` -> list floors with spot summary
+- `GET /floors/{floorId}/spots` -> list spots for floor
+- `GET /spots/{spotId}` -> spot detail
+- `POST /tickets` body: `{vehicleNumber}` -> allocate spot & create ticket
+- `GET /tickets/{ticketId}`
+- `DELETE /tickets/{ticketId}` -> unpark (vacate spot, close ticket)
+- `GET /tickets?active=true` -> active tickets
+- `GET /events?vehicleNumber=...` -> event history (park/unpark)
+- `POST /observers` body: `{channel:"SMS"|"WHATSAPP"}` -> register observer (optional)
+- `DELETE /observers/{observerId}`
+
+Responses should include clear status + data + error codes (e.g. 404 for unknown ticket, 409 for no spot). Unpark should be idempotent.
+
+**DB schema (relational)**  
+Normalization: spots fixed; tickets point to spot; events append\-only for audit.
+
+```sql
+-- vehicles registered (optional pre-registration)
+CREATE TABLE vehicles (
+  number VARCHAR(32) PRIMARY KEY,
+  type VARCHAR(16) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- parking floors
+CREATE TABLE parking_floors (
+  floor_id INT PRIMARY KEY,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- parking spots
+CREATE TABLE parking_spots (
+  spot_id INT PRIMARY KEY,
+  floor_id INT NOT NULL,
+  spot_type VARCHAR(16) NOT NULL,
+  is_occupied BOOLEAN NOT NULL DEFAULT FALSE,
+  current_vehicle_number VARCHAR(32) NULL,
+  CONSTRAINT fk_spot_floor FOREIGN KEY (floor_id) REFERENCES parking_floors(floor_id),
+  CONSTRAINT fk_spot_vehicle FOREIGN KEY (current_vehicle_number) REFERENCES vehicles(number)
+);
+
+-- tickets (active while not closed)
+CREATE TABLE tickets (
+  ticket_id VARCHAR(64) PRIMARY KEY,
+  vehicle_number VARCHAR(32) NOT NULL,
+  spot_id INT NOT NULL,
+  floor_id INT NOT NULL,
+  entry_time TIMESTAMP NOT NULL,
+  exit_time TIMESTAMP NULL,
+  status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
+  CONSTRAINT fk_ticket_vehicle FOREIGN KEY (vehicle_number) REFERENCES vehicles(number),
+  CONSTRAINT fk_ticket_spot FOREIGN KEY (spot_id) REFERENCES parking_spots(spot_id),
+  CONSTRAINT fk_ticket_floor FOREIGN KEY (floor_id) REFERENCES parking_floors(floor_id)
+);
+
+-- event log for observer notifications / audit
+CREATE TABLE parking_events (
+  event_id BIGSERIAL PRIMARY KEY,
+  ticket_id VARCHAR(64) NOT NULL,
+  event_type VARCHAR(16) NOT NULL, -- PARKED / UNPARKED
+  occurred_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_event_ticket FOREIGN KEY (ticket_id) REFERENCES tickets(ticket_id)
+);
+
+-- observers registry (optional)
+CREATE TABLE observers (
+  observer_id BIGSERIAL PRIMARY KEY,
+  channel VARCHAR(32) NOT NULL, -- SMS / WHATSAPP
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- indexes for performance
+CREATE INDEX idx_spots_floor_type_free ON parking_spots(floor_id, spot_type, is_occupied);
+CREATE INDEX idx_tickets_vehicle_active ON tickets(vehicle_number, status);
+CREATE INDEX idx_events_ticket ON parking_events(ticket_id);
+```
+
+**Key points**
+- `is_occupied` + `current_vehicle_number` enable fast allocation queries.
+- `tickets.exit_time` set on unpark; status flips to `CLOSED`.
+- Event log supports asynchronous notification or replay.
+- Floor denormalization in ticket (`floor_id`) avoids join for reporting.
+- Consider partitioning `parking_events` if high volume.

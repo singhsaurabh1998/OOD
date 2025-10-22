@@ -21,11 +21,6 @@ public class SeatLockProvider {
     public synchronized void lockSeats(List<Seat> seats, User user) {
         // First check if all requested seats can be locked
         for (Seat seat : seats) {
-            if (isSeatLocked(seat)) {
-                throw new RuntimeException("❌ Seat already locked: " + seat.getSeatId());
-            }
-        }
-        for (Seat seat : seats) {
             SeatLock seatLock = new SeatLock(seat, user, lockDurationSeconds);
             seatLocks.put(seat.getSeatId(), seatLock);
         }

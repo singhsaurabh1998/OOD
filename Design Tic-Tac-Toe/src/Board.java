@@ -23,10 +23,6 @@ public class Board {
         return true;
     }
 
-    void clearCell(int row, int col) {
-        board[row][col] = null;
-    }
-
     List<Position> getFreeCells() {
         List<Position> free = new ArrayList<>();
         for (int i = 0; i < size; i++) {

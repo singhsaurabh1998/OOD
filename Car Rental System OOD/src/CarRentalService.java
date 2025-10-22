@@ -8,10 +8,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CarRentalService {
-    private static CarRentalService instance = null;
+    private static final CarRentalService instance = null;
     private final Map<String, Car> cars; //number plate -> Car
-    private final Map<String, Reservation> reservations; //reservationId -> Reservation ** in this context, the reservations map in CarRentalService acts like an in-memory database.
+    //reservationId -> Reservation,
+    // the reservations map in CarRentalService acts like an in-memory database.
     //  If a reservation exists in the map, it means that the car is reserved for the specified date range.
+    private final Map<String, Reservation> reservations;
+
     private PaymentProcessor paymentProcessor;
 
     private CarRentalService() {
@@ -68,10 +71,11 @@ public class CarRentalService {
 
     /**
      * Make a reservation for a car if available.
-     * If you remove synchronized from the makeReservation method, multiple threads could execute it at the same time. This can cause:
+     * If you remove synchronized from the makeReservation method, multiple threads could execute it at the
+     * same time. This can cause:
      * Double booking: Two threads might reserve the same car for overlapping dates.
-     * Inconsistent state: The reservations map and car availability flag could be updated incorrectly, leading to data corruption.
-     * Race conditions: Unpredictable bugs that are hard to reproduce and debug.
+     * Inconsistent state: The reservations map and car availability flag could be updated incorrectly,
+     * leading to data corruption.
      * Using synchronized ensures thread safety for reservation creation in a concurrent environment.
      */
     public synchronized Reservation makeReservation(Customer customer, Car car, LocalDate startDate, LocalDate endDate) {

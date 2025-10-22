@@ -2,7 +2,10 @@ package services;
 
 import Observer.NotificationService;
 import enums.BookingStatus;
-import model.*;
+import model.Booking;
+import model.Seat;
+import model.Show;
+import model.User;
 import security.SeatLockProvider;
 
 import java.util.HashMap;
@@ -55,8 +58,8 @@ public class BookingService {
         bookingMap.put(bookingId, booking);
         user.addBooking(booking);
 
-        seatLockProvider.unlockSeats(seats, user); // unlock after successful booking
-        System.out.println("✅ Booking confirmed! ID: " + bookingId+" User is "+user.getName());
+        seatLockProvider.unlockSeats(seats, user); //
+        System.out.println("✅ Booking confirmed! ID: " + bookingId + " User is " + user.getName());
         show.printAllDetails();
         // 🔔 Notify
         notificationService.notifyObservers(booking);

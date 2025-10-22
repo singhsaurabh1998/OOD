@@ -1,6 +1,9 @@
+import lombok.Data;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+@Data
 public class Reservation {
     private final String reservationId;
     private final Customer customer;
@@ -21,25 +24,5 @@ public class Reservation {
     private double calculateTotalPrice() {
         long daysRented = ChronoUnit.DAYS.between(startDate, endDate) + 1;
         return car.getRentalPricePerDay() * daysRented;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public Car getCar() {
-        return car;
-    }
-
-    public double getTotalPrice() {
-        return totalPrice;
-    }
-
-    public String getReservationId() {
-        return reservationId;
     }
 }

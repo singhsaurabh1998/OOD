@@ -9,18 +9,21 @@ public class ParkingSpot {
     private final int id;
     private final VehicleType spotType;//for which type of vehicle it can be used
     private Vehicle vehicle; // null if free
+    private final int floorId;
 
-    public ParkingSpot(int id, VehicleType spotType) {
+    public ParkingSpot(int id, VehicleType spotType, int floorId) {
         this.id = id;
         this.spotType = spotType;
+        this.floorId = floorId;
+        this.vehicle = null;
     }
 
-    public boolean isFree() {
+    public boolean isSpotFree() {
         return vehicle == null;
     }
 
-    public synchronized boolean assign(Vehicle v) {
-        if (isFree() && v.getType() == spotType) {
+    public synchronized boolean assignSpot(Vehicle v) {
+        if (isSpotFree() && v.getType() == spotType) {
             this.vehicle = v;
             return true;
         }
@@ -41,5 +44,8 @@ public class ParkingSpot {
 
     public VehicleType getSpotType() {
         return spotType;
+    }
+    public int getFloorId() {
+        return floorId;
     }
 }

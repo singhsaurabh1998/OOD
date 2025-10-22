@@ -19,7 +19,7 @@ class TwitterSimplified {
 
     private class User {
         public int userId;
-        public Set<Integer> followed;
+        public Set<Integer> followed;// users followed by this user
         public Tweet head;
 
         public User(int userId) {
@@ -85,11 +85,11 @@ class TwitterSimplified {
 
     public void follow(int followerId, int followeeId) {
         if (!userMap.containsKey(followerId)) {
-            User u = new User(followerId);
-            userMap.put(followerId, u);
+            User u = new User(followerId);// create user if not present
+            userMap.put(followerId, u);//
         }
         if (!userMap.containsKey(followeeId)) {
-            User u = new User(followeeId);
+            User u = new User(followeeId);//
             userMap.put(followeeId, u);
         }
         userMap.get(followerId).follow(followeeId);

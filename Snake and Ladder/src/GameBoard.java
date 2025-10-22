@@ -4,15 +4,15 @@ import java.util.Queue;
 
 class GameBoard {
     private final Dice dice;
-    private final Queue<Player> nextTurn;
+    private final Queue<Player> players;
     private final List<Jumper> snakes;
     private final List<Jumper> ladders;
     private final Map<String, Integer> playersCurrentPosition;
     private final int boardSize;
 
-    GameBoard(Dice dice, Queue<Player> nextTurn, List<Jumper> snakes, List<Jumper> ladders, Map<String, Integer> playersCurrentPosition, int boardSize) {
+    GameBoard(Dice dice, Queue<Player> players, List<Jumper> snakes, List<Jumper> ladders, Map<String, Integer> playersCurrentPosition, int boardSize) {
         this.dice = dice;
-        this.nextTurn = nextTurn;
+        this.players = players;
         this.snakes = snakes;
         this.ladders = ladders;
         this.playersCurrentPosition = playersCurrentPosition;
@@ -20,9 +20,9 @@ class GameBoard {
     }
 
     void startGame() throws InterruptedException {
-        while (nextTurn.size() > 1) {
+        while (players.size() > 1) {
             //Thread.sleep(800);
-            Player player = nextTurn.poll();
+            Player player = players.poll();
             String playerName = player.getPlayerName();
             int currentPosition = playersCurrentPosition.get(playerName);
             int diceValue = dice.rollDice();
@@ -31,7 +31,7 @@ class GameBoard {
 
             // If move exceeds board size, skip turn
             if (nextCell > boardSize) {
-                nextTurn.offer(player);
+                players.offer(player);
                 continue;
             }
 
@@ -65,7 +65,7 @@ class GameBoard {
             } else {
                 playersCurrentPosition.put(playerName, nextCell);
                 System.out.println(playerName + " is at position " + nextCell);
-                nextTurn.offer(player);
+                players.offer(player);
             }
         }
     }

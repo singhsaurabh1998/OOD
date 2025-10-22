@@ -18,6 +18,5 @@ public class Dice {
             sum += (int) (Math.random() * 6) + 1;
         }
         return sum;
-//        return ((int) (Math.random()*(6*numberOfDice - 1*numberOfDice))) + 1;
     }
 }

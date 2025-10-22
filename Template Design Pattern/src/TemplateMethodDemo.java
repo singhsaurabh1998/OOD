@@ -13,7 +13,9 @@ abstract class NotificationSender {
     }
 
     protected abstract boolean validate(String recipient);
+
     protected abstract void composeMessage(String message);
+
     protected abstract void send(String recipient);
 
     protected void log() {
@@ -24,6 +26,7 @@ abstract class NotificationSender {
 // --- Email ---
 class EmailNotification extends NotificationSender {
     private String composedMessage;
+
     @Override
     protected boolean validate(String recipient) {
         return recipient.contains("@");
@@ -81,8 +84,9 @@ class PushNotification extends NotificationSender {
 }
 
 
-class SlackNotification extends NotificationSender{
+class SlackNotification extends NotificationSender {
     private String composedMessage;
+
     @Override
     protected boolean validate(String recipient) {
         return recipient.contains("salesforce");
@@ -95,9 +99,10 @@ class SlackNotification extends NotificationSender{
 
     @Override
     protected void send(String recipient) {
-        System.out.println("Sending Slack message to "+recipient+" "+composedMessage);
+        System.out.println("Sending Slack message to " + recipient + " " + composedMessage);
     }
 }
+
 // --- Main ---
 public class TemplateMethodDemo {
     public static void main(String[] args) {

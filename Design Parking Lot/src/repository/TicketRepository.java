@@ -2,8 +2,9 @@ package repository;
 
 import model.Ticket;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * TicketRepository is responsible for managing parking tickets.
@@ -11,7 +12,7 @@ import java.util.Map;
  * It uses an in-memory HashMap to store tickets, where the key is the ticket ID and the value is the Ticket object.
  */
 public class TicketRepository {
-    private final Map<String, Ticket> store = new HashMap<>();//id,ticket
+    private final Map<String, Ticket> store = new ConcurrentHashMap<>();//id,ticket
 
     public void save(Ticket ticket) {
         store.put(ticket.getTicketId(), ticket);
@@ -26,6 +27,6 @@ public class TicketRepository {
     }
 
     public Map<String, Ticket> showAllActiveTickets() {
-        return store;
+        return Collections.unmodifiableMap(store);
     }
 }

@@ -5,7 +5,7 @@ interface Coffee {
     double getCost();
 }
 
-// PlainCoffee.java
+//
 class PlainCoffee implements Coffee {
     @Override
     public String getDescription() {
@@ -79,7 +79,7 @@ class VanilaFlavour extends CoffeeDecorator {
 
     @Override
     public String getDescription() {
-        return decoratedCoffee.getDescription() + ", Vanila";
+        return decoratedCoffee.getDescription() + ", Vanilla";
     }
 
     @Override

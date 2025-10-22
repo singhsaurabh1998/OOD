@@ -28,7 +28,7 @@ class TurnOnCommand implements Command {
 }
 
 class TurnOffCommand implements Command {
-    private TV tv;
+    private final TV tv;
 
     public TurnOffCommand(TV tv) {
         this.tv = tv;

@@ -15,11 +15,13 @@ class Facade {
         allPlayers.offer(p1);
         allPlayers.offer(p2);
 
+        // Setting up snakes and ladders
         Jumper snake1 = new Jumper(10, 2, JumperType.SNAKE);
         Jumper snake2 = new Jumper(99, 12, JumperType.SNAKE);
         List<Jumper> snakes = new ArrayList<>();
         snakes.add(snake1);
         snakes.add(snake2);
+
         Jumper ladder1 = new Jumper(5, 25, JumperType.LADDER);
         Jumper ladder2 = new Jumper(40, 89, JumperType.LADDER);
         List<Jumper> ladders = new ArrayList<>();
@@ -38,7 +40,6 @@ public class PlaySnakeAndLadderClient {
         Player p2 = new Player("Sunda", 2);
         players.add(p1);
         players.add(p2);
-        facade.initialise(1, players);
 
         GameBoard gb = facade.initialise(1, players);
         gb.startGame();

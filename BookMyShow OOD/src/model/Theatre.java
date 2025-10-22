@@ -1,8 +1,12 @@
 package model;
 
+import lombok.Getter;
+
 import java.util.*;
 
 public class Theatre {
+    // Getters
+    @Getter
     private final String theatreId;
     private final String theaterName;
     private final String city;
@@ -19,11 +23,7 @@ public class Theatre {
         screens.add(screen);
     }
 
-    // Getters
-    public String getTheatreId() { return theatreId; }
     public String getName() { return theaterName; }
-    public String getCity() { return city; }
-    public List<Screen> getScreens() { return screens; }
 
     @Override
     public String toString() {

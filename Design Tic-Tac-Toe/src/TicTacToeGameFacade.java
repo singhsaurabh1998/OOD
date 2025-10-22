@@ -3,7 +3,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class TicTacToeGameFacade {
-
     private final Deque<Player> players;
     private final Board board;
     private final WinnerStrategy winnerStrategy;

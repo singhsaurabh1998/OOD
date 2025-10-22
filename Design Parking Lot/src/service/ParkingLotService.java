@@ -1,5 +1,6 @@
 package service;
 
+import enums.EventType;
 import model.ParkingFloor;
 import model.ParkingSpot;
 import model.Ticket;
@@ -11,6 +12,8 @@ import strategy.SpotAllocationStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ParkingLotService manages parking and unparking of vehicles,
@@ -25,36 +28,50 @@ public class ParkingLotService {
     private final List<ParkingFloor> floors = new ArrayList<>();
     private final SpotAllocationStrategy allocator;
     private final TicketRepository ticketRepo;
-    private final NotificationService notificationService = new NotificationService();
+    private final NotificationService notificationService;
+    private final Map<Integer, ParkingSpot> spotIndex = new ConcurrentHashMap<>();
+
 
     public ParkingLotService(List<ParkingFloor> initialFloors, SpotAllocationStrategy strategy) {
         floors.addAll(initialFloors);
         this.allocator = strategy;
         this.ticketRepo = new TicketRepository();
+        this.notificationService = new NotificationService();
+        indexSpots();
+    }
+
+    private void indexSpots() {
+        for (ParkingFloor floor : floors) {
+            for (ParkingSpot spot : floor.getSpots()) {
+                spotIndex.put(spot.getId(), spot);
+            }
+        }
     }
 
     public void addObserver(Observer obs) {
         notificationService.addObserver(obs);
     }
 
+    public void removeObserver(Observer obs) {
+        notificationService.removeObserver(obs);
+    }
+
     public Ticket parkVehicle(Vehicle vehicle) {
         ParkingSpot spot = allocator.allocateSpot(floors, vehicle);
-
         if (spot == null) {
             System.out.println("No spot available for " + vehicle.getNumber());
             return null;
         }
-
-        boolean assigned = spot.assign(vehicle); //synchronised call
+        // Try to assign the spot to the vehicle Synchronized
+        boolean assigned = spot.assignSpot(vehicle);
         if (!assigned) {
-            System.out.println("No slots left ");
+            System.out.println("Spot assignment failed for " + vehicle.getNumber());
             return null;
         }
-
-        Ticket ticket = new Ticket(vehicle.getNumber(), spot.getId());
+        System.out.println("Vehicle " + vehicle.getNumber() + " parked at spot " + spot.getId() + " at floor " + spot.getFloorId());
+        Ticket ticket = new Ticket(vehicle.getNumber(), spot.getId(), spot.getFloorId());
         ticketRepo.save(ticket);
-        notificationService.notifyObservers("PARKED", ticket);
-
+        notificationService.notifyObservers(EventType.PARKED, ticket);
         return ticket;
     }
 
@@ -63,16 +80,21 @@ public class ParkingLotService {
             System.out.println("Ticket is not valid !");
             return;
         }
-        String tickedId = ticket.getTicketId();
-        if (ticketRepo.find(tickedId) != null) {
-            ticketRepo.deleteTicket(tickedId);//delete from DB
-        } else
+        String ticketId = ticket.getTicketId();
+        Ticket stored = ticketRepo.find(ticketId);
+        if (stored != null) {
+            ParkingSpot spot = spotIndex.get(stored.getSpotId());
+            if (spot != null) {
+                spot.vacate();
+            }
+            notificationService.notifyObservers(EventType.UNPARKED, stored);
+            ticketRepo.deleteTicket(ticketId);
+        } else {
             System.out.println("This Id is not in our DB");
+        }
     }
 
     public void showAllTickets() {
         System.out.println("All active tickets: " + ticketRepo.showAllActiveTickets());
     }
-
 }
-
