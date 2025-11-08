@@ -8,11 +8,11 @@
 public class Player {
 
     public String name;
-    public PlayingPiece playingPiece; //X or O which piece the player is using
+    public PieceType pieceType; //X or O which piece the player is using
 
-    public Player(String name, PlayingPiece playingPiece) {
+    public Player(String name, PieceType playingPiece) {
         this.name = name;
-        this.playingPiece = playingPiece;
+        this.pieceType = playingPiece;
     }
 
     public String getName() {

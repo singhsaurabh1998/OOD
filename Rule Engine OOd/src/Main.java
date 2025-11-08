@@ -47,7 +47,7 @@ class CreditScoreRule implements Rule {
     }
 
     public void execute(Context ctx) {
-        System.out.println("Credit score too low: REJECT loan.");
+        System.out.println("Credit score Passed Accept loan.");
     }
 }
 

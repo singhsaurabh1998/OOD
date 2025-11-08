@@ -1,4 +1,5 @@
 package models;
+//represents a single item in an order
 public class OrderLineItem {
     private final String productId;
     private final String productName;

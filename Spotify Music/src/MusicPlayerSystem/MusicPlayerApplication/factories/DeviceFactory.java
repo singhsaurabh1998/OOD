@@ -1,6 +1,5 @@
 package MusicPlayerSystem.MusicPlayerApplication.factories;
 
-
 import MusicPlayerSystem.MusicPlayerApplication.device.*;
 import MusicPlayerSystem.MusicPlayerApplication.enums.DeviceType;
 import MusicPlayerSystem.MusicPlayerApplication.external.*;

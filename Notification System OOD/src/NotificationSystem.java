@@ -1,5 +1,6 @@
 // Java version of Notification System using Decorator, Observer, Strategy, and Singleton Patterns
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,7 @@ class TimestampDecorator extends INotificationDecorator {
     }
 
     public String getContent() {
-        return "[2025-04-13 14:22:00] " + notification.getContent();
+        return LocalDateTime.now() + notification.getContent();
     }
 }
 
@@ -68,11 +69,12 @@ interface IObserver {
 
 interface Subject {
     void addObserver(IObserver observer);
+
     void removeObserver(IObserver observer);
+
     void notifyObservers();
 }
 
-// Concrete Observable/
 class NotificationObservable implements Subject {
     private final List<IObserver> observers = new ArrayList<>();//store all the observers
     private INotification currentNotification;
@@ -101,6 +103,7 @@ class NotificationObservable implements Subject {
     }
 }
 
+// Concrete Observer 2
 class NotificationEngine implements IObserver {
     private final NotificationObservable notificationObservable;
     private final List<INotificationStrategy> notificationStrategies = new ArrayList<>();
@@ -120,6 +123,7 @@ class NotificationEngine implements IObserver {
         }
     }
 }
+
 // Concrete Observer 1
 class Logger implements IObserver {
     private final NotificationObservable notificationObservable;
@@ -182,12 +186,12 @@ class PopUpStrategy implements INotificationStrategy {
 
 // Singleton class
 class NotificationService {
-    private final NotificationObservable observable;
+    private final NotificationObservable observableService;
     private static NotificationService instance;
     private final List<INotification> notifications = new ArrayList<>(); //just for tracking purpose
 
     private NotificationService() {
-        observable = new NotificationObservable();
+        observableService = new NotificationObservable();
     }
 
     public static NotificationService getInstance() {
@@ -198,12 +202,12 @@ class NotificationService {
     }
 
     public NotificationObservable getObservable() {
-        return observable;
+        return observableService;
     }
 
     public void sendNotification(INotification notification) {
         notifications.add(notification);
-        observable.setNotification(notification);
+        observableService.setNotification(notification);
     }
 }
 
@@ -217,7 +221,7 @@ public class NotificationSystem {
         NotificationObservable notificationObservable = notificationService.getObservable();
 
         // Create Logger Observer
-          Logger logger = new Logger(notificationObservable);
+        Logger logger = new Logger(notificationObservable);
         // Create NotificationEngine observers.
         NotificationEngine notificationEngine = new NotificationEngine(notificationObservable);
 
@@ -226,13 +230,13 @@ public class NotificationSystem {
         notificationEngine.addNotificationStrategy(new PopUpStrategy());
 
         // Attach these observers.
-         notificationObservable.addObserver(logger);
+        notificationObservable.addObserver(logger);
         notificationObservable.addObserver(notificationEngine);
 
         // Create a notification with decorators.
         INotification notification = new SimpleNotification("Your order has been shipped!");
         notification = new TimestampDecorator(notification);
-        notification = new SignatureDecorator(notification, "Customer Care");
+        notification = new SignatureDecorator(notification, "Customer Care - SignatureDecorator");
 
         notificationService.sendNotification(notification);
     }

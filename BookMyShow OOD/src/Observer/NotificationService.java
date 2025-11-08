@@ -23,6 +23,7 @@ public class NotificationService implements BookingSubject {
     public void removeObserver(BookingObserver observer) {
         observers.remove(observer);
     }
+
     // Notify all observers after booking confirmation
     @Override
     public void notifyObservers(Booking booking) {

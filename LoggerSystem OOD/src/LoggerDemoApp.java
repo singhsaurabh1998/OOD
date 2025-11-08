@@ -53,6 +53,7 @@ class FileLogWriter implements LogWriter {
         System.out.println("(File) " + formattedMessage);
     }
 }
+
 /**
  * Factory Pattern:
  * Creates LogWriter objects based on type.
@@ -142,7 +143,7 @@ public class LoggerDemoApp {
         // Get singleton logger
         Logger logger = Logger.getInstance();
 
-        LogWriter console = LogWriterFactory.getLogWriter(LogWriterMethod.CONSOLE);
+        LogWriter console = LogWriterFactory.getLogWriter(LogWriterMethod.FILE);
         logger.setLogWriter(console);
         logger.setLogType(LogType.INFO);
         // By default, level = INFO, writer = console

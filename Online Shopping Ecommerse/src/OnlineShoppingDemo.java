@@ -18,9 +18,14 @@ public class OnlineShoppingDemo {
                 .withDescription("A classic book for software developers.")
                 .withCategory(ProductCategory.BOOKS)
                 .build();
+        Product shirt = new Product.Builder("Plain white", 1499)
+                .withCategory(ProductCategory.CLOTHING)
+                .withDescription("By H&M")
+                .build();
 
         system.addProduct(laptop, 10); // 10 laptops in stock
         system.addProduct(book, 50);   // 50 books in stock
+        system.addProduct(shirt, 30);   // 30 shirt in stock
 
         // --- Register a Customer ---
         Address aliceAddress = new Address("123 Main St", "Anytown", "CA", "12345");

@@ -1,5 +1,6 @@
 import java.util.Scanner;
 
+// Simple MoveProvider that reads moves from the console input and return Position.
 public class ConsoleMoveProvider implements MoveProvider {
     private final Scanner scanner = new Scanner(System.in);
 

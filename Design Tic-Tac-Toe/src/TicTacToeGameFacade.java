@@ -27,7 +27,7 @@ public class TicTacToeGameFacade {
                 return new GameResult(true, null);
 
             Position move = moveProvider.getNextMove(current, board);
-            boolean success = board.addPiece(move.row, move.col, current.playingPiece);
+            boolean success = board.addPiece(move.row, move.col, current.pieceType);
 
             if (!success) {
                 System.out.println("Invalid move, try again.");
@@ -35,7 +35,7 @@ public class TicTacToeGameFacade {
                 continue;
             }
 
-            if (winnerStrategy.checkWinner(board, move, current.playingPiece.pieceType)) {
+            if (winnerStrategy.checkWinner(board, move, current.pieceType)) {
                 board.printBoard();
                 return new GameResult(false, current);
             }

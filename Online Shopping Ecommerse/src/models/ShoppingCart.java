@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ShoppingCart {
-    private final Map<String, CartItem> items = new HashMap<>();
+    private final Map<String, CartItem> items = new HashMap<>();// Key: productId, Value: CartItem
 
     public void addItem(Product product, int quantity) {
         if (items.containsKey(product.getId())) {

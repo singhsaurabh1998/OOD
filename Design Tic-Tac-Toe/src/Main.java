@@ -2,8 +2,8 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
-        Player p1 = new Player("Player1", new PlayingPiece(PieceType.X));
-        Player p2 = new Player("Player2", new PlayingPiece(PieceType.O));
+        Player p1 = new Player("Player1", PieceType.X);
+        Player p2 = new Player("Player2", PieceType.O);
 
         TicTacToeGameFacade game = new TicTacToeGameFacade(
                 3,
@@ -13,7 +13,9 @@ public class Main {
         );
 
         GameResult result = game.startGame();
-        if (result.tie) System.out.println("Game ended in a tie!");
-        else System.out.println("Winner is: " + result.winner.name);
+        if (result.tie)
+            System.out.println("Game ended in a tie!");
+        else
+            System.out.println("Winner is: " + result.winner.name);
     }
 }

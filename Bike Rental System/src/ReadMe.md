@@ -117,12 +117,309 @@ SOLID:
 
 # 6 — Example API endpoints (REST)
 
-* `POST /rentals/reserve` — body: customerId, category, criteria, start, end → returns reservationId
 * `POST /rentals/rent` — body: customerId, vehicleId, start → start rental immediately
 * `POST /rentals/{rentalId}/return` — body: endTime → returns receipt
 * `GET /vehicles?category=bike&size=SMALL&available=true` — search inventory
 * `GET /customers/{id}/rentals` — rental history
+* (Optional)`POST /rentals/reserve` — body: customerId, category, criteria, start, end → returns reservationId
 
+# Sample API Requests & Responses
+
+## 1. POST /rentals/reserve
+
+**Reserve a vehicle for future rental**
+
+### Request
+```json
+{
+  "customerId": "CUST-101",
+  "category": "BIKE",
+  "criteria": {
+    "size": "MEDIUM"
+  },
+  "startTime": "2024-01-15T10:00:00Z",
+  "endTime": "2024-01-15T18:00:00Z"
+}
+```
+
+### Response (Success - 201 Created)
+```json
+{
+  "reservationId": "RES-5001",
+  "status": "RESERVED",
+  "customerId": "CUST-101",
+  "vehicleId": "BIKE-42",
+  "category": "BIKE",
+  "details": {
+    "size": "MEDIUM",
+    "sku": "B-MED-042"
+  },
+  "startTime": "2024-01-15T10:00:00Z",
+  "endTime": "2024-01-15T18:00:00Z",
+  "estimatedAmount": 80.00,
+  "currency": "USD",
+  "expiresAt": "2024-01-15T09:45:00Z",
+  "message": "Reservation confirmed. Please pick up by 09:45 AM on Jan 15."
+}
+```
+
+---
+
+## 2. POST /rentals/rent
+
+**Start rental immediately**
+
+### Request
+```json
+{
+  "customerId": "CUST-202",
+  "vehicleId": "SCOOTER-15",
+  "startTime": "2024-01-10T14:30:00Z"
+}
+```
+
+### Response (Success - 201 Created)
+```json
+{
+  "rentalId": "RENT-7823",
+  "status": "ONGOING",
+  "customerId": "CUST-202",
+  "vehicleId": "SCOOTER-15",
+  "vehicleDetails": {
+    "category": "SCOOTER",
+    "fuelType": "ELECTRIC",
+    "sku": "S-ELEC-015"
+  },
+  "startTime": "2024-01-10T14:30:00Z",
+  "endTime": null,
+  "createdAt": "2024-01-10T14:30:05Z",
+  "message": "Rental started successfully. Enjoy your ride!"
+}
+```
+
+### Response (Error - 409 Conflict)
+```json
+{
+  "error": "VEHICLE_NOT_AVAILABLE",
+  "message": "Vehicle SCOOTER-15 is currently rented by another customer",
+  "availableUntil": "2024-01-10T18:00:00Z"
+}
+```
+
+---
+
+## 3. POST /rentals/{rentalId}/return
+
+**Return a rented vehicle**
+
+### Request
+```http
+POST /rentals/RENT-7823/return
+```
+
+```json
+{
+  "endTime": "2024-01-10T18:45:00Z"
+}
+```
+
+### Response (Success - 200 OK)
+```json
+{
+  "rentalId": "RENT-7823",
+  "status": "COMPLETED",
+  "receipt": {
+    "customerId": "CUST-202",
+    "customerName": "John Doe",
+    "vehicleId": "SCOOTER-15",
+    "vehicleDetails": {
+      "category": "SCOOTER",
+      "fuelType": "ELECTRIC"
+    },
+    "startTime": "2024-01-10T14:30:00Z",
+    "endTime": "2024-01-10T18:45:00Z",
+    "duration": {
+      "hours": 4,
+      "minutes": 15
+    },
+    "pricingBreakdown": {
+      "baseRate": 10.00,
+      "hourlyRate": 8.00,
+      "totalHours": 4.25,
+      "subtotal": 44.00,
+      "tax": 3.52,
+      "totalAmount": 47.52
+    },
+    "currency": "USD",
+    "pricingStrategy": "HOURLY",
+    "returnedAt": "2024-01-10T18:45:10Z"
+  },
+  "message": "Thank you for riding with us!"
+}
+```
+
+---
+
+## 4. GET /vehicles
+
+**Search available inventory**
+
+### Request
+```http
+GET /vehicles?category=BIKE&size=SMALL&available=true
+```
+
+### Response (Success - 200 OK)
+```json
+{
+  "totalCount": 3,
+  "vehicles": [
+    {
+      "vehicleId": "BIKE-08",
+      "sku": "B-SML-008",
+      "category": "BIKE",
+      "size": "SMALL",
+      "fuelType": null,
+      "available": true,
+      "condition": "EXCELLENT",
+      "lastMaintenance": "2024-01-05",
+      "hourlyRate": 6.00,
+      "dailyRate": 40.00
+    },
+    {
+      "vehicleId": "BIKE-12",
+      "sku": "B-SML-012",
+      "category": "BIKE",
+      "size": "SMALL",
+      "fuelType": null,
+      "available": true,
+      "condition": "GOOD",
+      "lastMaintenance": "2024-01-03",
+      "hourlyRate": 6.00,
+      "dailyRate": 40.00
+    },
+    {
+      "vehicleId": "BIKE-19",
+      "sku": "B-SML-019",
+      "category": "BIKE",
+      "size": "SMALL",
+      "fuelType": null,
+      "available": true,
+      "condition": "NEW",
+      "lastMaintenance": "2024-01-08",
+      "hourlyRate": 7.00,
+      "dailyRate": 45.00
+    }
+  ]
+}
+```
+
+### Response (No Results - 200 OK)
+```json
+{
+  "totalCount": 0,
+  "vehicles": [],
+  "message": "No vehicles found matching your criteria"
+}
+```
+
+---
+
+## 5. GET /customers/{id}/rentals
+
+**Get rental history for a customer**
+
+### Request
+```http
+GET /customers/CUST-101/rentals
+```
+
+### Response (Success - 200 OK)
+```json
+{
+  "customerId": "CUST-101",
+  "customerName": "Jane Smith",
+  "totalRentals": 5,
+  "rentals": [
+    {
+      "rentalId": "RENT-9001",
+      "vehicleId": "BIKE-25",
+      "vehicleDetails": {
+        "category": "BIKE",
+        "size": "LARGE"
+      },
+      "status": "ONGOING",
+      "startTime": "2024-01-12T09:00:00Z",
+      "endTime": null,
+      "amount": null
+    },
+    {
+      "rentalId": "RENT-8765",
+      "vehicleId": "SCOOTER-07",
+      "vehicleDetails": {
+        "category": "SCOOTER",
+        "fuelType": "PETROL"
+      },
+      "status": "COMPLETED",
+      "startTime": "2024-01-08T11:00:00Z",
+      "endTime": "2024-01-08T16:30:00Z",
+      "amount": 55.00,
+      "duration": {
+        "hours": 5,
+        "minutes": 30
+      }
+    },
+    {
+      "rentalId": "RENT-8320",
+      "vehicleId": "BIKE-12",
+      "vehicleDetails": {
+        "category": "BIKE",
+        "size": "MEDIUM"
+      },
+      "status": "COMPLETED",
+      "startTime": "2024-01-03T14:00:00Z",
+      "endTime": "2024-01-03T18:00:00Z",
+      "amount": 32.00,
+      "duration": {
+        "hours": 4,
+        "minutes": 0
+      }
+    }
+  ],
+  "statistics": {
+    "totalSpent": 187.00,
+    "averageRentalDuration": "4.5 hours",
+    "favoriteCategory": "BIKE"
+  }
+}
+```
+
+---
+
+## Error Response Format (Common)
+
+All error responses follow this structure:
+
+```json
+{
+  "error": "ERROR_CODE",
+  "message": "Human-readable error message",
+  "timestamp": "2024-01-10T15:30:00Z",
+  "path": "/rentals/rent",
+  "details": {
+    "field": "vehicleId",
+    "rejectedValue": "BIKE-999"
+  }
+}
+```
+
+**Common Error Codes:**
+- `VEHICLE_NOT_FOUND` - 404
+- `VEHICLE_NOT_AVAILABLE` - 409
+- `CUSTOMER_NOT_FOUND` - 404
+- `RENTAL_NOT_FOUND` - 404
+- `INVALID_REQUEST` - 400
+- `RENTAL_ALREADY_COMPLETED` - 409
 ---
 
 # 7 — DB Schema (basic)

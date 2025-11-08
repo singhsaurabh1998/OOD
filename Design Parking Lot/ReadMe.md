@@ -173,7 +173,384 @@ Base: `/api/v1`
 - `DELETE /observers/{observerId}`
 
 Responses should include clear status + data + error codes (e.g. 404 for unknown ticket, 409 for no spot). Unpark should be idempotent.
+# Sample API Request/Response Examples
 
+Based on the **Parking Lot** design with `ParkingLot`, `Floor`, `ParkingSpot`, `Ticket`, and `NotificationService`:
+
+---
+
+## 1. POST `/api/v1/vehicles` — Register Vehicle
+
+**Request:**
+```json
+POST /api/v1/vehicles
+Content-Type: application/json
+
+{
+  "number": "KA-01-HH-1234",
+  "type": "CAR"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "status": "success",
+  "data": {
+    "number": "KA-01-HH-1234",
+    "type": "CAR",
+    "createdAt": "2025-06-15T10:30:00Z"
+  }
+}
+```
+
+**Error (409 Conflict):**
+```json
+{
+  "status": "error",
+  "code": 409,
+  "message": "Vehicle with number KA-01-HH-1234 already registered"
+}
+```
+
+---
+
+## 2. GET `/api/v1/vehicles/{number}` — Get Vehicle Details
+
+**Request:**
+```
+GET /api/v1/vehicles/KA-01-HH-1234
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "data": {
+    "number": "KA-01-HH-1234",
+    "type": "CAR",
+    "createdAt": "2025-06-15T10:30:00Z"
+  }
+}
+```
+
+**Error (404 Not Found):**
+```json
+{
+  "status": "error",
+  "code": 404,
+  "message": "Vehicle not found"
+}
+```
+
+---
+
+## 3. GET `/api/v1/floors` — List Floors with Spot Summary
+
+**Request:**
+```
+GET /api/v1/floors
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "floorId": 1,
+      "totalSpots": 50,
+      "availableSpots": 32,
+      "spotSummary": {
+        "COMPACT": { "total": 20, "available": 15 },
+        "MEDIUM": { "total": 20, "available": 12 },
+        "LARGE": { "total": 10, "available": 5 }
+      }
+    },
+    {
+      "floorId": 2,
+      "totalSpots": 50,
+      "availableSpots": 40,
+      "spotSummary": {
+        "COMPACT": { "total": 20, "available": 18 },
+        "MEDIUM": { "total": 20, "available": 17 },
+        "LARGE": { "total": 10, "available": 5 }
+      }
+    }
+  ]
+}
+```
+
+---
+
+## 4. GET `/api/v1/floors/{floorId}/spots` — List Spots for Floor
+
+**Request:**
+```
+GET /api/v1/floors/1/spots
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "data": {
+    "floorId": 1,
+    "spots": [
+      {
+        "spotId": 101,
+        "spotType": "COMPACT",
+        "isOccupied": false,
+        "currentVehicle": null
+      },
+      {
+        "spotId": 102,
+        "spotType": "COMPACT",
+        "isOccupied": true,
+        "currentVehicle": "KA-01-HH-1234"
+      },
+      {
+        "spotId": 103,
+        "spotType": "MEDIUM",
+        "isOccupied": false,
+        "currentVehicle": null
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 5. GET `/api/v1/spots/{spotId}` — Spot Detail
+
+**Request:**
+```
+GET /api/v1/spots/102
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "data": {
+    "spotId": 102,
+    "floorId": 1,
+    "spotType": "COMPACT",
+    "isOccupied": true,
+    "currentVehicle": "KA-01-HH-1234",
+    "distanceFromEntrance": 25
+  }
+}
+```
+
+**Error (404):**
+```json
+{
+  "status": "error",
+  "code": 404,
+  "message": "Spot not found"
+}
+```
+
+---
+
+## 6. POST `/api/v1/park` — Park Vehicle (Allocate Spot & Create Ticket)
+
+**Request:**
+```json
+POST /api/v1/tickets
+Content-Type: application/json
+
+{
+  "vehicleNumber": "KA-01-HH-1234"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "status": "success",
+  "data": {
+    "ticketId": "TKT-1718450400-102",
+    "vehicleNumber": "KA-01-HH-1234",
+    "spotId": 102,
+    "floorId": 1,
+    "entryTime": "2025-06-15T10:40:00Z",
+    "status": "ACTIVE"
+  }
+}
+```
+
+**Error (409 Conflict — No Spot Available):**
+```json
+{
+  "status": "error",
+  "code": 409,
+  "message": "No available parking spot for vehicle type CAR"
+}
+```
+
+**Error (409 — Vehicle Already Parked):**
+```json
+{
+  "status": "error",
+  "code": 409,
+  "message": "Vehicle KA-01-HH-1234 already has an active ticket"
+}
+```
+
+---
+
+## 7. GET `/api/v1/tickets/{ticketId}` — Get Ticket Details
+
+**Request:**
+```
+GET /api/v1/tickets/TKT-1718450400-102
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "data": {
+    "ticketId": "TKT-1718450400-102",
+    "vehicleNumber": "KA-01-HH-1234",
+    "spotId": 102,
+    "floorId": 1,
+    "entryTime": "2025-06-15T10:40:00Z",
+    "exitTime": null,
+    "status": "ACTIVE"
+  }
+}
+```
+
+---
+
+## 8. DELETE `/api/v1/unpark/{ticketId}` — Unpark Vehicle
+
+**Request:**
+```
+DELETE /api/v1/tickets/TKT-1718450400-102
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "data": {
+    "ticketId": "TKT-1718450400-102",
+    "vehicleNumber": "KA-01-HH-1234",
+    "spotId": 102,
+    "floorId": 1,
+    "entryTime": "2025-06-15T10:40:00Z",
+    "exitTime": "2025-06-15T12:15:00Z",
+    "duration": "1h 35m",
+    "fee": 50.0,
+    "status": "CLOSED"
+  }
+}
+```
+
+**Error (404):**
+```json
+{
+  "status": "error",
+  "code": 404,
+  "message": "Ticket not found"
+}
+```
+
+**Idempotent (Already Closed):**
+```json
+{
+  "status": "success",
+  "data": {
+    "ticketId": "TKT-1718450400-102",
+    "status": "CLOSED",
+    "message": "Ticket already closed"
+  }
+}
+```
+
+---
+
+## 9. GET `/api/v1/tickets?active=true` — List Active Tickets
+
+**Request:**
+```
+GET /api/v1/tickets?active=true
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "ticketId": "TKT-1718450500-103",
+      "vehicleNumber": "MH-12-AB-5678",
+      "spotId": 103,
+      "floorId": 1,
+      "entryTime": "2025-06-15T11:00:00Z",
+      "status": "ACTIVE"
+    },
+    {
+      "ticketId": "TKT-1718450600-201",
+      "vehicleNumber": "DL-03-CD-9012",
+      "spotId": 201,
+      "floorId": 2,
+      "entryTime": "2025-06-15T11:10:00Z",
+      "status": "ACTIVE"
+    }
+  ]
+}
+```
+
+---
+
+## 10. GET `/api/v1/events?vehicleNumber=...` — Event History
+
+**Request:**
+```
+GET /api/v1/events?vehicleNumber=KA-01-HH-1234
+```
+
+**Response (200 OK):**
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "eventId": 1001,
+      "ticketId": "TKT-1718450400-102",
+      "eventType": "PARKED",
+      "occurredAt": "2025-06-15T10:40:00Z"
+    },
+    {
+      "eventId": 1002,
+      "ticketId": "TKT-1718450400-102",
+      "eventType": "UNPARKED",
+      "occurredAt": "2025-06-15T12:15:00Z"
+    }
+  ]
+}
+```
+
+---
+
+## 
+
+
+---
+
+## Summary
+
+All responses follow consistent structure:
+- `status`: `"success"` or `"error"`
+- `data`: response payload
+- `code` + `message` for errors
+- HTTP status codes: `200 OK`, `201 Created`, `404 Not Found`, `409 Conflict`
 **DB schema (relational)**  
 Normalization: spots fixed; tickets point to spot; events append\-only for audit.
 

@@ -13,6 +13,13 @@ public class CustomQueueStrategy implements PlayStrategy {
     private final Queue<Song> nextQueue;
     private final Stack<Song> prevStack;
 
+    public CustomQueueStrategy() {
+        currentPlaylist = null;
+        currentIndex = -1;
+        nextQueue = new LinkedList<>();
+        prevStack = new Stack<>();
+    }
+
     private Song nextSequential() {
         if (currentPlaylist.getSize() == 0) {
             throw new RuntimeException("Playlist is empty.");
@@ -27,13 +34,6 @@ public class CustomQueueStrategy implements PlayStrategy {
         }
         currentIndex = currentIndex - 1;
         return currentPlaylist.getSongs().get(currentIndex);
-    }
-
-    public CustomQueueStrategy() {
-        currentPlaylist = null;
-        currentIndex = -1;
-        nextQueue = new LinkedList<>();
-        prevStack = new Stack<>();
     }
 
     @Override
@@ -103,9 +103,6 @@ public class CustomQueueStrategy implements PlayStrategy {
 
     @Override
     public void addToNext(Song song) {
-        if (song == null) {
-            throw new RuntimeException("Cannot enqueue null song.");
-        }
         nextQueue.add(song);
     }
 }

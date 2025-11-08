@@ -16,7 +16,7 @@ import java.util.Map;
 public class BookingService {
     private final Map<String, Booking> bookingMap = new HashMap<>();
     private final SeatLockProvider seatLockProvider;
-    NotificationService notificationService;
+    private final NotificationService notificationService;
 
     private static int bookingCounter = 1;
 

@@ -8,8 +8,10 @@ import model.Vehicle;
 import observer.NotificationService;
 import observer.Observer;
 import repository.TicketRepository;
+import strategy.IPricingStrategy;
 import strategy.SpotAllocationStrategy;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,22 +32,21 @@ public class ParkingLotService {
     private final TicketRepository ticketRepo;
     private final NotificationService notificationService;
     private final Map<Integer, ParkingSpot> spotIndex = new ConcurrentHashMap<>();
+    private final IPricingStrategy pricingStrategy;
 
-
-    public ParkingLotService(List<ParkingFloor> initialFloors, SpotAllocationStrategy strategy) {
+    public ParkingLotService(List<ParkingFloor> initialFloors, SpotAllocationStrategy strategy, IPricingStrategy pricingStrategy) {
         floors.addAll(initialFloors);
         this.allocator = strategy;
         this.ticketRepo = new TicketRepository();
         this.notificationService = new NotificationService();
+        this.pricingStrategy = pricingStrategy;
         indexSpots();
     }
 
     private void indexSpots() {
-        for (ParkingFloor floor : floors) {
-            for (ParkingSpot spot : floor.getSpots()) {
+        for (ParkingFloor floor : floors)
+            for (ParkingSpot spot : floor.getSpots())
                 spotIndex.put(spot.getId(), spot);
-            }
-        }
     }
 
     public void addObserver(Observer obs) {
@@ -75,23 +76,26 @@ public class ParkingLotService {
         return ticket;
     }
 
-    public void unparkVehicle(Ticket ticket) {
+    public double unparkVehicle(Ticket ticket) {
         if (ticket == null) {
             System.out.println("Ticket is not valid !");
-            return;
+            return 0;
         }
-        String ticketId = ticket.getTicketId();
-        Ticket stored = ticketRepo.find(ticketId);
+        Ticket stored = ticketRepo.find(ticket.getTicketId());
         if (stored != null) {
             ParkingSpot spot = spotIndex.get(stored.getSpotId());
             if (spot != null) {
                 spot.vacate();
             }
             notificationService.notifyObservers(EventType.UNPARKED, stored);
-            ticketRepo.deleteTicket(ticketId);
+            ticketRepo.deleteTicket(ticket.getTicketId());
         } else {
             System.out.println("This Id is not in our DB");
+            return 0;
         }
+        // Calculate parking fee
+        double totalfee = pricingStrategy.calculateFee(ticket.getEntryTime(), LocalDateTime.now());
+        return totalfee;
     }
 
     public void showAllTickets() {

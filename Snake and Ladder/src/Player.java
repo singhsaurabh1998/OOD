@@ -6,7 +6,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @EqualsAndHashCode
-class Player {
+public class Player {
     private String playerName;
     private int id;
     private int currentPosition; // encapsulated

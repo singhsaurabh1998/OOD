@@ -16,6 +16,7 @@ public class OrderService {
     }
 
     public Order createOrder(Customer customer, ShoppingCart cart) {
+        //
         List<OrderLineItem> result = new ArrayList<>();
         cart.getItems().values().stream()
                 .map(cartItem -> new OrderLineItem(

@@ -26,6 +26,7 @@ public class Seat {
         this.isBooked = true;
     }
 
+    // Cancel the seat booking by setting isBooked to false
     public void cancelSeat() {
         this.isBooked = false;
     }

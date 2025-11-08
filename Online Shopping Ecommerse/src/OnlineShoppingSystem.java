@@ -10,9 +10,9 @@ public class OnlineShoppingSystem {
     private static volatile OnlineShoppingSystem instance;
 
     // Data stores
-    private final Map<String, Product> products = new ConcurrentHashMap<>();
-    private final Map<String, Customer> customers = new ConcurrentHashMap<>();
-    private final Map<String, Order> orders = new ConcurrentHashMap<>();
+    private final Map<String, Product> products = new ConcurrentHashMap<>();// Key: productId, Value: Product
+    private final Map<String, Customer> customers = new ConcurrentHashMap<>();// Key: customerId, Value: Customer
+    private final Map<String, Order> orders = new ConcurrentHashMap<>();// Key: orderId, Value: Order
 
     // Services
     private final InventoryService inventoryService;

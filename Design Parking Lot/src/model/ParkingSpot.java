@@ -15,10 +15,10 @@ public class ParkingSpot {
         this.id = id;
         this.spotType = spotType;
         this.floorId = floorId;
-        this.vehicle = null;
     }
 
-    public boolean isSpotFree() {
+    // Check if the parking spot is free
+    public synchronized boolean isSpotFree() {
         return vehicle == null;
     }
 
@@ -45,6 +45,7 @@ public class ParkingSpot {
     public VehicleType getSpotType() {
         return spotType;
     }
+
     public int getFloorId() {
         return floorId;
     }

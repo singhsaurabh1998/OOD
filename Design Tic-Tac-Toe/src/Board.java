@@ -9,14 +9,14 @@ import java.util.List;
  */
 public class Board {
     int size;
-    PlayingPiece[][] board;
+    PieceType[][] board;
 
     Board(int size) {
         this.size = size;
-        this.board = new PlayingPiece[size][size];
+        this.board = new PieceType[size][size];
     }
 
-    boolean addPiece(int row, int col, PlayingPiece piece) {
+    boolean addPiece(int row, int col, PieceType piece) {
         if (row < 0 || row >= size || col < 0 || col >= size) return false;
         if (board[row][col] != null) return false;
         board[row][col] = piece;
@@ -37,7 +37,7 @@ public class Board {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (board[i][j] == null) System.out.print(" . ");
-                else System.out.print(" " + board[i][j].pieceType + " ");
+                else System.out.print(" " + board[i][j] + " ");
             }
             System.out.println();
         }

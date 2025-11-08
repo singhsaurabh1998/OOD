@@ -1,8 +1,11 @@
 package model;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+@Getter
 public class Show {
     private final String showId;
     private final Movie movie;
@@ -27,26 +30,6 @@ public class Show {
             }
         }
         return availableSeats;
-    }
-
-    public String getShowId() {
-        return showId;
-    }
-
-    public Movie getMovie() {
-        return movie;
-    }
-
-    public LocalDateTime getShowTime() {
-        return showTime;
-    }
-
-    public Screen getScreen() {
-        return screen;
-    }
-
-    public List<Seat> getSeats() {
-        return seats;
     }
 
 

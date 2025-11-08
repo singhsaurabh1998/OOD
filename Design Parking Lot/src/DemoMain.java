@@ -1,12 +1,13 @@
-package demo;
-
 import FacadeLayer.EntrancePanel;
 import enums.VehicleType;
-import model.*;
+import model.ParkingFloor;
+import model.ParkingSpot;
+import model.Ticket;
 import observer.SMS;
 import observer.WhatsApp;
 import service.ParkingLotService;
 import strategy.FirstAvailableSpotAllocator;
+import strategy.HourlyPricing;
 import strategy.SpotAllocationStrategy;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class DemoMain {
             System.out.println("[Demo] Floors initialized: " + floors.size());
 
             SpotAllocationStrategy strategy = new FirstAvailableSpotAllocator();
-            ParkingLotService service = new ParkingLotService(floors, strategy);
+            ParkingLotService service = new ParkingLotService(floors, strategy, new HourlyPricing(5, 4));
             System.out.println("[Demo] Service created.");
             service.addObserver(new SMS());
             service.addObserver(new WhatsApp());
@@ -54,7 +55,8 @@ public class DemoMain {
 
             service.showAllTickets();
 
-            service.unparkVehicle(t2); // free bike
+            double fee = service.unparkVehicle(t2); // free bike
+            System.out.println("Fee for ticket2: " + fee);
             service.unparkVehicle(t1); // free car
             service.showAllTickets();
 

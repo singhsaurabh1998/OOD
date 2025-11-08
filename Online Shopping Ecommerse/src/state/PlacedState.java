@@ -16,6 +16,7 @@ public class PlacedState implements OrderState {
         System.out.println("Cannot deliver an order that has not been shipped.");
     }
 
+    //shipped state can allow cancellation before delivery
     @Override
     public void cancel(Order order) {
         System.out.println("Cancelling order " + order.getId());
