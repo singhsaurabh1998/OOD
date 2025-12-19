@@ -101,7 +101,7 @@ public class DecoratorPattern {
         System.out.println("Cost: $" + milkCoffee.getCost());
 
         // Coffee with Sugar and Milk
-        Coffee sugarMilkCoffee = new MilkDecorator(new VanilaFlavour (new SugarDecorator(new PlainCoffee())));
+        Coffee sugarMilkCoffee = new MilkDecorator(new VanilaFlavour(new SugarDecorator(new PlainCoffee())));
         System.out.println("\nDescription: " + sugarMilkCoffee.getDescription());
         System.out.println("Cost: $" + sugarMilkCoffee.getCost());
     }

@@ -53,11 +53,11 @@ public class SeatLockProvider {
         if (!seatLocks.containsKey(seat.getSeatId())) return false;
 
         SeatLock lock = seatLocks.get(seat.getSeatId());
+        // Check if lock has expired
         if (lock.isLockExpired()) {
             seatLocks.remove(seat.getSeatId());
             return false;
         }
-
         return lock.getLockedBy().equals(user);
     }
 }

@@ -5,7 +5,7 @@ public class PlaySnakeAndLadderClient {
         List<Player> players = new ArrayList<>();
         Facade facade = new Facade();
         Player p1 = new Player("Saurabh", 1);
-        Player p2 = new Player("Sunda", 2);
+        Player p2 = new Player("Amit", 2);
         players.add(p1);
         players.add(p2);
 

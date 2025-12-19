@@ -156,8 +156,8 @@ class RazorpayGateway extends PaymentGateway {
 // Proxy class that wraps a PaymentGateway to add retries (Proxy Pattern)
 // ----------------------------
 class PaymentGatewayProxy extends PaymentGateway {
-    private PaymentGateway realGateway;
-    private int retries;
+    private final PaymentGateway realGateway;
+    private final int retries;
 
     public PaymentGatewayProxy(PaymentGateway gateway, int maxRetries) {
         this.realGateway = gateway;
@@ -260,6 +260,7 @@ class PaymentService {
 // ----------------------------
 class PaymentController {
     private static final PaymentController instance = new PaymentController();
+    PaymentService paymentService = PaymentService.getInstance();
 
     private PaymentController() {
     }
@@ -269,9 +270,9 @@ class PaymentController {
     }
 
     public boolean handlePayment(GatewayType type, PaymentRequest req) {
-        PaymentGateway paymentGateway = GatewayFactory.getInstance().getGateway(type);
-        PaymentService.getInstance().setGateway(paymentGateway);
-        return PaymentService.getInstance().processPayment(req);
+        PaymentGateway paymentGateway = GatewayFactory.getInstance().getGateway(type);//get appropriate gateway
+        paymentService.setGateway(paymentGateway);
+        return paymentService.processPayment(req);
     }
 }
 
@@ -288,12 +289,12 @@ public class PaymentGatewayApplication {
         System.out.println("Result: " + (res1 ? "SUCCESS" : "FAIL"));
         System.out.println("------------------------------\n");
 
-        PaymentRequest req2 = new PaymentRequest("Shubham", "Aditya", 500.0, "USD");
-
-        System.out.println("Processing via Razorpay");
-        System.out.println("------------------------------");
-        boolean res2 = PaymentController.getInstance().handlePayment(GatewayType.RAZORPAY, req2);
-        System.out.println("Result: " + (res2 ? "SUCCESS" : "FAIL"));
-        System.out.println("------------------------------");
+//        PaymentRequest req2 = new PaymentRequest("Shubham", "Aditya", 500.0, "USD");
+//
+//        System.out.println("Processing via Razorpay");
+//        System.out.println("------------------------------");
+//        boolean res2 = PaymentController.getInstance().handlePayment(GatewayType.RAZORPAY, req2);
+//        System.out.println("Result: " + (res2 ? "SUCCESS" : "FAIL"));
+//        System.out.println("------------------------------");
     }
 }

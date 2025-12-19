@@ -16,12 +16,6 @@ public class Screen {
     public void addShow(Show show) {
         shows.add(show);
     }
-
-    // Getters
-    public String getScreenId() { return screenId; }
-    public String getScreenName() { return screenName; }
-    public List<Show> getShows() { return shows; }
-
     @Override
     public String toString() {
         return "Screen{" +

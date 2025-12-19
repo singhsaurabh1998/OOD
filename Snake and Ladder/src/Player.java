@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @EqualsAndHashCode
 public class Player {
-    private String playerName;
     private int id;
+    private String playerName;
     private int currentPosition; // encapsulated
 
     Player(String playerName, int id) {

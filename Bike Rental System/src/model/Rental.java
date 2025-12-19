@@ -24,6 +24,7 @@ public class Rental {
         this.startTime = LocalDateTime.now();
     }
 
+    // Complete the rental by setting end time and amount and updating status
     public void endRental(LocalDateTime endTime, double amount) {
         this.endTime = endTime;
         this.amount = amount;

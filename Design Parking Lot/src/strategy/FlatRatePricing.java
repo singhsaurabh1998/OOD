@@ -2,8 +2,9 @@ package strategy;
 
 import java.time.LocalDateTime;
 
-public class FlatRatePricing implements IPricingStrategy{
+public class FlatRatePricing implements IPricingStrategy {
     private final double flatRate;
+
     public FlatRatePricing(double flatRate) {
         this.flatRate = flatRate;
     }

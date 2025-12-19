@@ -42,7 +42,7 @@ public class BookMyShowMain {
         Runnable bookingTask1 = () -> {
             try {
                 System.out.println("👤 Saurabh trying to lock seats...");
-                bookingService.lockSeats(user1, totalSeats);
+                bookingService.lockSeats(user1, totalSeats);//try to lock seats first
                 Thread.sleep(100); // simulate some delay (e.g., payment)
                 bookingService.confirmBooking(user1, show, totalSeats);
             } catch (Exception e) {

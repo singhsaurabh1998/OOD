@@ -37,7 +37,8 @@ class LowSpeedState implements FanState{
         fan.setState(new HighSpeedState());
     }
 }
-class HighSpeedState implements FanState{
+
+class HighSpeedState implements FanState {
 
     @Override
     public void pressButton(Fan fan) {

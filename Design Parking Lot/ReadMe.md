@@ -150,13 +150,6 @@ After this you’ll be ready to ask me to implement the core parts (I can produc
 
 # Next step
 
-I can now **implement the above** in Java (core classes only) with:
-
-* Thread-safe `Park`/`Unpark` logic,
-* One allocator (Nearest) and one pricing strategy (Hourly),
-* Simple in-memory `TicketRepository`,
-* A small `main()` to demo.
-
 **API (REST)**  
 Base: `/api/v1`
 - `POST /vehicles` body: `{number, type}` -> register vehicle
@@ -164,9 +157,9 @@ Base: `/api/v1`
 - `GET /floors` -> list floors with spot summary
 - `GET /floors/{floorId}/spots` -> list spots for floor
 - `GET /spots/{spotId}` -> spot detail
-- `POST /tickets` body: `{vehicleNumber}` -> allocate spot & create ticket
+- `POST /park ` body: `{vehicleNumber}` -> allocate spot & create ticket
 - `GET /tickets/{ticketId}`
-- `DELETE /tickets/{ticketId}` -> unpark (vacate spot, close ticket)
+- `DELETE /api/v1/unpark/{ticketId}` -> unpark (vacate spot, close ticket)
 - `GET /tickets?active=true` -> active tickets
 - `GET /events?vehicleNumber=...` -> event history (park/unpark)
 - `POST /observers` body: `{channel:"SMS"|"WHATSAPP"}` -> register observer (optional)
@@ -622,3 +615,48 @@ CREATE INDEX idx_events_ticket ON parking_events(ticket_id);
 - Event log supports asynchronous notification or replay.
 - Floor denormalization in ticket (`floor_id`) avoids join for reporting.
 - Consider partitioning `parking_events` if high volume.
+  If you make `Vehicle` abstract, here's the recommended structure:
+
+**Abstract Vehicle class:**
+<!-- replace lines 5 to 12 -->
+```java
+public abstract class Vehicle {
+    private final String number;
+    private final VehicleType type;
+
+    protected Vehicle(String number, VehicleType type) {
+        this.number = number;
+        this.type = type;
+    }
+```
+
+**Subclass examples:**
+
+```java
+public class Car extends Vehicle {
+    public Car(String number) {
+        super(number, VehicleType.CAR);
+    }
+}
+```
+
+```java
+public class Motorcycle extends Vehicle {
+    public Motorcycle(String number) {
+        super(number, VehicleType.MOTORCYCLE);
+    }
+}
+```
+
+```java
+public class Truck extends Vehicle {
+    public Truck(String number) {
+        super(number, VehicleType.TRUCK);
+    }
+}
+```
+
+Key changes:
+- Constructor is now `protected` (only subclasses can call it)
+- Each subclass passes its specific `VehicleType` to the parent constructor
+- Subclasses can add their own specific fields/methods if needed
