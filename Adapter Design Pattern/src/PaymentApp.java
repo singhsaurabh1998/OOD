@@ -52,6 +52,6 @@ public class PaymentApp {
         PaymentProcessor stripeProcessor = new StripeAdapter(new StripeAPI());
         PaymentProcessor paypalProcessor = new PayPalAdapter(new PaypalAPI());
         stripeProcessor.pay(40);
-        paypalProcessor.pay(50);
+        paypalProcessor.pay(55);
     }
 }
