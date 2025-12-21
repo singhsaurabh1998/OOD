@@ -1,4 +1,3 @@
-
 # Introduction to Object-Oriented Design
 
 Below is an article that contains the necessary details for an introduction to object-oriented design. The UML diagrams have been prepared using [Mermaid](https://github.com/mermaid-js/mermaid).
@@ -392,3 +391,14 @@ classDiagram
 
 ## Conclusion
 In conclusion, Object-Oriented Design (OOD) offers a powerful approach to software development, enabling the creation of modular, reusable, and maintainable code. By modeling systems as collections of objects that interact with each other, OOD promotes encapsulation, inheritance, and polymorphism, facilitating the design of robust and flexible systems.
+
+# OOD Java Project
+
+## How to Run
+
+1. Open this folder in IntelliJ IDEA.
+2. Ensure the `src` folder is marked as a source root (right-click > Mark Directory as > Sources Root).
+3. Open your main class (the one with `public static void main(String[] args)`).
+4. Right-click the file and select "Run 'Main'".
+
+If you have multiple main classes, repeat step 3-4 for the desired class.
