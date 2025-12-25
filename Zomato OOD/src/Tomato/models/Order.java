@@ -25,13 +25,8 @@ public abstract class Order {
     }
 
     public boolean processPayment() {
-        if (paymentStrategy != null) {
-            paymentStrategy.pay(total);
-            return true;
-        } else {
-            System.out.println("Please choose a payment mode first");
-            return false;
-        }
+        paymentStrategy.pay(total);
+        return true;
     }
 
     public abstract String getType();
